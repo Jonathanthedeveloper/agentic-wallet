@@ -9,15 +9,15 @@ async function main() {
 
     const wallet = createTradingWallet();
 
-    const messages: UIMessage[] = [];
     let cycle = 0;
 
 
     while (true) {
         const stream = chat({
-            messages: [],
+            messages: [{ role: "user", content: `Cycle ${cycle}: Assess the market and decide on trading actions.` }],
             adapter: openRouterText("google/gemini-2.5-pro"),
             tools: toTanstackTools(wallet),
+
             systemPrompts: [`You are an autonomous trading agent operating on Solana via Jupiter.
 Your goal is to grow the wallet's portfolio value over time by making smart, profitable trading decisions.
 
@@ -48,12 +48,25 @@ After each action cycle report:
 - Current portfolio (token, balance, USD value)
 - Action taken (swap/limit order/lend/hold) with rationale
 - Transaction result or order details
-- Estimated portfolio change (in USD)`]
+- Estimated portfolio change (in USD)`],
+            modelOptions: {
+                parallel_tool_calls: true,
+                include_reasoning: true
+            }
         })
 
         for await (const chunk of stream) {
-            console.log(chunk); // Process each chunk
+            // @ts-ignore
+            if (chunk.delta) {
+                // @ts-ignorex
+                console.log(chunk.delta); // Process delta updates
+            }
 
+            // @ts-ignore
+            if (chunk.toolName) {
+                // @ts-ignore
+                console.log(`Tool called: ${chunk.toolName} with input: ${JSON.stringify(chunk.input)}`);
+            }
 
         }
 

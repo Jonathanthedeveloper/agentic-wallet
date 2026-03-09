@@ -1,294 +1,72 @@
-# Autonomous Trading Agent v2.0
+# Autonomous Trading Agent
 
-An **elite autonomous trading agent** that hunts for DeFi opportunities 24/7 using TanStack AI + OpenRouter + Jupiter. Built for production with risk management, performance tracking, and circuit breakers.
+An autonomous trading agent that uses TanStack AI + OpenRouter + Jupiter to manage a Solana portfolio continuously.
 
-## 🚀 Key Features
+## Features
 
-### Autonomous Trading
-- **24/7 Operation** - Runs continuously, scanning markets every 5 minutes
-- **AI-Powered Decisions** - Uses TanStack AI with OpenRouter (Claude, GPT, etc.)
-- **Automatic Execution** - AI decides when to scan, analyze, and trade
-- **Multi-Strategy** - Adapts to market conditions automatically
+- **Autonomous loop** - Runs indefinitely, triggering a new AI decision cycle every 5 seconds
+- **TanStack AI** - Uses `@tanstack/ai` with OpenRouter (Gemini 2.5 Pro by default)
+- **Jupiter integration** - Swaps, limit orders, lending, and token security checks via the Jupiter plugin
+- **Built-in risk rules** - Max 30% concentration per token, always keeps 0.02 SOL for fees, skips flagged tokens
 
-### Risk Management (Production-Ready)
-- **Circuit Breakers** - Stops trading if daily loss limit hit
-- **Position Sizing** - Max 30% concentration in any token
-- **Stop Losses** - Automatic 5% stop loss on all positions
-- **Take Profits** - 10% profit targets
-- **Liquidity Checks** - Only trades tokens with $100k+ liquidity
-- **Security Scans** - Verifies tokens before trading
-
-### Performance Tracking
-- **Win Rate Monitoring** - Tracks success rate of trades
-- **P&L Tracking** - Real-time profit/loss calculations
-- **Max Drawdown** - Monitors portfolio drawdown
-- **Daily Limits** - Configurable daily loss limits
-
-### Safety Features
-- **Dry Run Mode** - Test strategies without executing trades
-- **Pause/Resume** - Manual control to stop/start trading
-- **Session Stats** - Detailed performance metrics
-
-## 📦 Setup
+## Setup
 
 ```bash
-cd apps/trading-agent
+cd apps/examples/trading-agent
 bun install
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 Create a `.env` file:
 
 ```bash
 # Required
 SOLANA_PRIVATE_KEY=your_base58_private_key
-SOLANA_RPC_URL=https://api.devnet.solana.com
-OPENROUTER_API_KEY=your_openrouter_api_key
 
-# Optional - Risk Management
-MAX_TRADE_SIZE_USD=100          # Max $ per trade
-MAX_DAILY_LOSS_USD=50           # Stop if lose $50/day
-MAX_POSITION_CONCENTRATION=0.3  # Max 30% in one token
-STOP_LOSS_PERCENT=5             # 5% stop loss
-TAKE_PROFIT_PERCENT=10          # 10% take profit
-MIN_LIQUIDITY_USD=100000        # Min $100k liquidity
-
-# Optional - Agent Settings
-OPENROUTER_MODEL=openai/gpt-4o  # or anthropic/claude-3.5-sonnet
-MAX_CYCLES=0                     # 0 = infinite
-CYCLE_INTERVAL_MS=300000         # 5 minutes
+# Optional
+SOLANA_RPC_URL=https://api.devnet.solana.com  # defaults to devnet
+JUPITER_API_KEY=your_jupiter_api_key
 ```
 
-## 🎯 Usage
-
-### Live Trading
+## Usage
 
 ```bash
 bun run src/index.ts
 ```
 
-### Dry Run (Test Mode)
+## How It Works
 
-```ts
-import { createTradingWallet } from './wallet.js';
-import { createAutonomousTradingAgent } from './agent.js';
+Each cycle the agent:
 
-const wallet = createTradingWallet();
-const agent = createAutonomousTradingAgent({ 
-    wallet,
-    dryRun: true,  // No real trades!
-    riskConfig: {
-        maxTradeSizeUSD: 50,
-        maxDailyLossUSD: 25,
-    }
-});
+1. Fetches current portfolio holdings
+2. Checks prices for held assets plus several high-momentum tokens
+3. Runs `jupiter_get_shield` on unfamiliar tokens before trading
+4. Decides the best action: swap, limit order, lend idle assets, or hold
+5. Executes the action and reports the outcome with a transaction link
+6. Summarises portfolio state and P&L
 
-await agent.start();
-```
+The agent then waits 5 seconds before starting the next cycle.
 
-### With Custom Risk Settings
+## Risk Rules (enforced via system prompt)
 
-```ts
-const agent = createAutonomousTradingAgent({ 
-    wallet,
-    model: "anthropic/claude-3.5-sonnet",
-    cycleIntervalMs: 600000,  // 10 minutes
-    riskConfig: {
-        maxTradeSizeUSD: 200,
-        maxPositionConcentration: 0.25,
-        stopLossPercent: 3,
-        takeProfitPercent: 15,
-    }
-});
-```
+- Never put more than 30% of total portfolio value in a single non-stable token
+- Always keep at least 0.02 SOL for transaction fees
+- Skip any token flagged by shield as high-risk (freeze/mint authority without verified info)
+- Prefer liquidity and verified tokens over hype
 
-## 🤖 How It Works
+## Available Tools
 
-### Trading Loop
+The agent has access to all Jupiter tools (exposed via `jupiterPlugin`):
 
-1. **Portfolio Analysis** - AI checks current holdings and allocations
-2. **Market Scan** - Searches for high-potential opportunities
-3. **Risk Assessment** - Verifies liquidity, security, volatility
-4. **Strategy Selection** - Chooses best approach (swap, limit order, DCA)
-5. **Execution** - Enters positions with proper sizing
-6. **Monitoring** - Tracks P&L and adjusts
-7. **Rebalancing** - Maintains optimal portfolio mix
-
-### Decision Flow
-
-```
-┌┐
-│  1. SCAN MARKET                          │
-│     - Get portfolio holdings             │
-│     - Check token prices                 │
-│     - Identify opportunities             │
-└┬┘
-               │
-┌▼┐
-│  2. ANALYZE                              │
-│     - Technical analysis                 │
-│     - Risk assessment                    │
-│     - Opportunity scoring                │
-└┬┘
-               │
-┌▼┐
-│  3. DECIDE                               │
-│     - Buy/Sell/Hold                      │
-│     - Position sizing                    │
-│     - Entry/Exit strategy                │
-└┬┘
-               │
-┌▼┐
-│  4. EXECUTE                              │
-│     - Verify security (jupiter_get_shield)
-│     - Check liquidity                    │
-│     - Submit transaction                 │
-└┬┘
-               │
-┌▼┐
-│  5. MONITOR                              │
-│     - Track P&L                          │
-│     - Check stop losses                  │
-│     - Rebalance if needed                │
-└┘
-```
-
-## 📊 Performance Metrics
-
-The agent tracks:
-
-- **Win Rate** - % of profitable trades
-- **Total P&L** - Cumulative profit/loss
-- **Average Return** - Per-trade performance
-- **Max Drawdown** - Peak-to-trough decline
-- **Daily P&L** - Profit/loss per day
-
-```
-🚀 AUTONOMOUS TRADING AGENT v2.0
-
-⚙️ Configuration:
-   Model: openai/gpt-4o
-   Wallet: 7x...9z
-   Cycle: 300s
-   Mode: Infinite
-   Risk: Max $100/trade, 5% SL, 10% TP
-   Dry Run: NO (LIVE TRADING)
-
-💰 Starting trading session...
-
-🔄 [Cycle #1] 14:32:15
-   Analyzing market opportunities...
-   [AI analyzes portfolio, scans market...]
-   BUY SOL $50 [executed: 0.3 SOL @ $166.50]
-   ✅ Cycle complete | Win Rate: 0.0% | P&L: $0.00
-
-⏳ Next cycle in 300s...
-
-🔄 [Cycle #2] 14:37:15
-   Analyzing market opportunities...
-   HOLD [Portfolio up 2.3%, no action needed]
-   ✅ Cycle complete | Win Rate: 0.0% | P&L: +$1.15
-```
-
-## 🛡️ Safety Features
-
-### Circuit Breakers
-- Daily loss limit reached → **Auto-pause**
-- Max drawdown exceeded → **Auto-pause**
-- Suspicious token detected → **Skip trade**
-
-### Position Limits
-- Never exceed max position concentration
-- Never trade more than max trade size
-- Only trade tokens with sufficient liquidity
-
-### Dry Run Mode
-Test strategies without risking funds:
-
-```ts
-const agent = createAutonomousTradingAgent({ 
-    wallet,
-    dryRun: true,
-});
-// AI analyzes and decides, but no trades execute
-```
-
-## 🎛️ Controls
-
-```ts
-// Pause trading manually
-agent.pause();
-
-// Resume trading
-agent.resume();
-
-// Run single cycle
-await agent.runOnce();
-
-// Get current stats
-const stats = agent.getStats();
-console.log(stats);
-// {
-//   cyclesCompleted: 42,
-//   address: "7x...9z",
-//   totalTrades: 15,
-//   winningTrades: 9,
-//   losingTrades: 6,
-//   totalPnlUSD: 127.50,
-//   winRate: 0.6,
-//   avgReturn: 8.50,
-//   maxDrawdown: 0.03,
-//   isPaused: false
-// }
-```
-
-## 🔧 Available Tools
-
-The AI has access to all Jupiter tools:
-
-- `jupiter_swap` - Execute swaps
+- `jupiter_swap` - Execute token swaps
 - `jupiter_get_token_price` - Real-time prices
-- `jupiter_search_token` - Find tokens
-- `jupiter_get_holdings` - Portfolio check
-- `jupiter_create_limit_order` - Automated orders
+- `jupiter_search_token` - Find tokens by name or address
+- `jupiter_get_holdings` - Check portfolio holdings
+- `jupiter_create_limit_order` - Place limit orders
 - `jupiter_create_recurring_order` - DCA strategies
-- `jupiter_lend_deposit` - Yield farming
-- `jupiter_get_shield` - Security verification
-
-## ⚠️ Risk Warning
-
-**Start with dry run mode!**
-
-```ts
-dryRun: true  // Test first
-```
-
-**Then start small:**
-
-```ts
-riskConfig: {
-    maxTradeSizeUSD: 10,      // Start with $10
-    maxDailyLossUSD: 25,      // Stop if lose $25
-}
-```
-
-**Monitor closely before scaling up.**
-
-## 📝 Best Practices
-
-1. **Test on devnet** first with small amounts
-2. **Use dry run mode** to validate strategies
-3. **Set conservative limits** initially
-4. **Monitor daily** until confident
-5. **Adjust risk** based on performance
-6. **Keep SOL for gas** (0.5+ SOL recommended)
-
-## 🔗 Links
-
-- OpenRouter: https://openrouter.ai/
-- Jupiter: https://jup.ag/
-- TanStack AI: https://tanstack.com/ai
+- `jupiter_lend_deposit` / `jupiter_lend_withdraw` - Yield on idle assets
+- `jupiter_get_shield` - Security verification before trading
 
 ## License
 
