@@ -1,0 +1,28 @@
+---
+title: Observability
+description: Logging and metrics guidance for wallet and plugin actions.
+---
+
+## Log Per Action
+
+- action name
+- input summary (redacted)
+- chain and wallet address
+- success/failure
+- transaction signature(s)
+- error code/message
+
+## Key Metrics
+
+- success rate by action
+- p95 latency by action
+- RPC failure rate by endpoint
+- confirmation time distribution
+
+## Alerting
+
+Alert on:
+
+- repeated `INVALID_ACTION` spikes
+- sustained RPC/send failures
+- unusual increase in high-value write attempts

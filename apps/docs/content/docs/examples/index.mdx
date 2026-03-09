@@ -1,0 +1,52 @@
+---
+title: Examples
+description: Working examples of agentic wallets with different integrations.
+---
+
+This section contains working examples demonstrating how to use Agentic Wallet with various agent frameworks and interfaces.
+
+## Available Examples
+
+| Example | Description | Use Case |
+|---------|-------------|----------|
+| [CLI](/docs/examples/cli) | Command-line interface for agents | OpenClaw, ClawDBot, autonomous agents |
+| [MCP Server](/docs/examples/mcp) | Model Context Protocol integration | Claude Desktop, Cursor, Continue, Roo |
+
+## CLI Example
+
+The CLI is designed for **autonomous AI agents** that need to programmatically manage wallets:
+
+- Execute shell commands for wallet operations
+- Run as MCP server for MCP-compatible agents
+- Integrate with agents like OpenClaw, ClawDBot
+
+```bash
+# Quick start
+agent-wallet address
+agent-wallet balance
+agent-wallet tool run jupiter_swap '{"inputMint":"...","outputMint":"...","amount":"0.1"}'
+```
+
+[View CLI Guide →](/docs/examples/cli)
+
+## MCP Server Example
+
+The MCP server is for **AI agents that support the Model Context Protocol**:
+
+- Claude Desktop
+- Cursor
+- Continue (VS Code)
+- Roo
+- Codeium
+
+Configure your agent to connect to the MCP server and get instant Solana wallet capabilities.
+
+[View MCP Guide →](/docs/examples/mcp)
+
+## Running Examples
+
+All examples require:
+1. A Solana private key in the environment
+2. An RPC endpoint (devnet by default)
+
+See individual example pages for specific setup instructions.

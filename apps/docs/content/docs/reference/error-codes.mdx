@@ -1,0 +1,22 @@
+---
+title: Error Codes
+description: Error codes exposed by AgentWalletError.
+---
+
+## Codes
+
+| Code | Meaning |
+| --- | --- |
+| `INVALID_ACTION` | Invalid input, missing data, unsupported operation, or failed precondition. |
+| `EXECUTOR_FAILURE` | Execution failed in the chain/protocol path. |
+| `NETWORK_FAILURE` | Network or RPC communication failed. |
+| `INITIALIZATION_FAILURE` | Wallet/plugin initialization failed. |
+
+## Error Type
+
+```ts
+new AgentWalletError(code, message, {
+  cause?: unknown,
+  details?: Record<string, unknown>,
+})
+```

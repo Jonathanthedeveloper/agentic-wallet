@@ -1,0 +1,40 @@
+{
+  "name": "@agentic-wallet/adapters-tanstack",
+  "version": "0.0.1",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup index.ts --format esm --dts --clean --sourcemap"
+  },
+  "dependencies": {
+    "@agentic-wallet/core": "workspace:*",
+    "@tanstack/ai": "^0.5.1"
+  },
+  "description": "TanStack AI adapter for Agentic Wallet",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jonathanthedeveloper/agentic-wallet.git",
+    "directory": "packages/adapters-tanstack"
+  },
+  "keywords": ["tanstack", "wallet", "ai", "agent", "adapter"],
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

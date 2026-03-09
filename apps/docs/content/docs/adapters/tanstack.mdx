@@ -1,0 +1,28 @@
+---
+title: TanStack Adapter
+description: Map `getTools()` to TanStack AI server tools.
+---
+
+## Function
+
+```ts
+toTanstackTools(source)
+```
+
+Input:
+
+```ts
+{ getTools(): AgentTool[] }
+```
+
+Output:
+
+An array of TanStack AI `ServerTool` definitions.
+
+## Example
+
+```ts
+import { toTanstackTools } from '@agentic-wallet/adapters-tanstack';
+
+const tools = toTanstackTools(wallet);
+```

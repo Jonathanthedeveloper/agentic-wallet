@@ -1,0 +1,25 @@
+---
+title: Deployment
+description: Production deployment guidelines for agent-wallet services.
+---
+
+## Runtime Requirements
+
+- reliable RPC endpoints for your chain
+- secure secret management for wallet keys
+- controlled access path to write methods
+- structured logs for every write call
+
+## Environment Variables
+
+Typical setup includes:
+
+- RPC URL
+- private key material (or signer integration)
+
+## Service Pattern
+
+1. Initialize provider and wallet once at startup.
+2. Register required plugins.
+3. Expose a restricted action interface to your agent/runtime.
+4. Log all write attempts with action input and result signatures.

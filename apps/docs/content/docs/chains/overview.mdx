@@ -1,0 +1,28 @@
+---
+title: Chains Overview
+description: Chain packages built on top of the core wallet/plugin model.
+---
+
+## Model
+
+`@agentic-wallet/core` provides the base `AgentWallet` class and plugin/tool types.
+
+Chain packages extend that base class and implement chain-specific execution.
+
+## Available Chains
+
+| Chain | Package | Status |
+| --- | --- | --- |
+| Solana | `@agentic-wallet/solana` | Available |
+
+## Chain Package Responsibilities
+
+A chain package usually provides:
+
+- wallet class (for example `SolanaAgentWallet`)
+- provider/signer helpers
+- chain-native methods
+- chain-specific tools
+- chain plugin entrypoints
+
+See [Solana](/docs/chains/solana/wallet) for the current implementation.

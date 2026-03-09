@@ -1,0 +1,40 @@
+{
+  "name": "agentic-wallet",
+  "version": "0.0.1",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "apps/examples/*"
+  ],
+  "scripts": {
+    "typecheck": "bun test",
+    "build": "bun run build:core && bun run build:solana && bun run build:adapters-tanstack && bun run build:adapters-vercel && bun run build:adapters-mcp && bun run build:docs",
+    "start": "bun run --watch"
+  },
+  "description": "TypeScript wallet primitives for AI agents on Solana. Wallet SDK.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jonathanthedeveloper/agentic-wallet.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Jonathanthedeveloper/agentic-wallet/issues"
+  },
+  "homepage": "https://github.com/Jonathanthedeveloper/agentic-wallet#readme",
+  "keywords": [
+    "solana",
+    "wallet",
+    "ai",
+    "agent",
+    "defi",
+    "trading",
+    "jupiter",
+    "raydium",
+    "mcp",
+    "autonomous"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

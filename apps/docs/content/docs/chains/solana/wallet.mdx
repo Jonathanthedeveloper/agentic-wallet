@@ -1,0 +1,109 @@
+---
+title: Solana Wallet
+description: Constructor and methods for SolanaAgentWallet.
+---
+
+## Constructor
+
+```ts
+new SolanaAgentWallet({
+  rpcUrl,
+  provider,
+  commitment?,
+  explorerCluster?,
+})
+```
+
+Input type: `SolanaAgentWalletConfig`
+
+- `rpcUrl: string`
+- `provider: SolanaWalletProvider`
+- `commitment?: Commitment`
+- `explorerCluster?: 'mainnet-beta' | 'devnet' | 'testnet'`
+
+## Properties
+
+- `address: string`
+- `connection: Connection`
+- `provider: SolanaWalletProvider`
+- `explorerCluster: ExplorerCluster`
+
+## Methods
+
+### `balance(input?)`
+
+Input type: `BalanceInput`
+
+```ts
+{ address?: string; mint?: string }
+```
+
+Returns: `Promise<SolanaBalanceResult>`
+
+```ts
+{
+  address: string;
+  balance: number;
+  rawAmount?: string;
+  decimals?: number;
+  lamports?: string;
+  mint?: string;
+}
+```
+
+### `transfer(input)`
+
+Input type: `TransferInput`
+
+```ts
+{
+  to: string;
+  amount: number | string;
+  mint?: string;
+  createAssociatedTokenAccount?: boolean;
+}
+```
+
+Returns: `Promise<SolanaTransferResult>`
+
+```ts
+{
+  signature: string;
+  explorerUrl: string;
+  from: string;
+  to: string;
+  amount: string;
+  rawAmount: string;
+  mint?: string;
+}
+```
+
+### `requestAirdrop(input?)`
+
+Input type: `AirdropInput`
+
+```ts
+{ address?: string; amount?: number | string }
+```
+
+Returns: `Promise<SolanaAirdropResult>`
+
+```ts
+{
+  signature: string;
+  explorerUrl: string;
+  address: string;
+  amount: string;
+  rawAmount: string;
+}
+```
+
+## Plugin Registration
+
+```ts
+import { raydiumPlugin } from '@agentic-wallet/solana/plugin';
+
+const walletWithRaydium = wallet.use(raydiumPlugin());
+```
+
+`wallet.use(...)` augments the wallet instance with plugin methods and adds plugin tools to `wallet.getTools()`.

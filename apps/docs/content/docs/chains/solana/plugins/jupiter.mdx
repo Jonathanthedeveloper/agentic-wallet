@@ -1,0 +1,357 @@
+---
+title: Jupiter Plugin
+description: Jupiter methods and tool contracts for SolanaAgentWallet.
+---
+
+The Jupiter plugin provides comprehensive access to Jupiter's trading, lending, and prediction market APIs. This is the recommended plugin for token swaps and DeFi interactions.
+
+## Setup
+
+```ts
+import { SolanaAgentWallet, createKeypairProvider } from '@agentic-wallet/solana';
+import { jupiterPlugin } from '@agentic-wallet/solana/plugin';
+
+const wallet = new SolanaAgentWallet({
+  rpcUrl: 'https://api.devnet.solana.com',
+  provider: createKeypairProvider(process.env.SOLANA_PRIVATE_KEY!),
+}).use(jupiterPlugin({
+  apiKey: process.env.JUPITER_API_KEY,
+}));
+```
+
+## Plugin Config
+
+```ts
+jupiterPlugin({
+  apiKey?: string,        // Optional Jupiter API key for rate limiting
+  apiUrl?: string,       // Optional API base URL override (defaults to https://api.jup.ag)
+})
+```
+
+## Method Naming
+
+All plugin methods are prefixed with `jupiter` to avoid collisions with other plugins.
+
+## Token Swaps
+
+### `jupiterSwap`
+
+```ts
+jupiterSwap(input: JupiterSwapInput): Promise<JupiterSwapResult>
+```
+
+Input fields:
+
+- `inputMint: string` - Input token mint address
+- `outputMint: string` - Output token mint address
+- `amount?: number | string` - Human-readable amount (e.g. "1.5")
+- `amountRaw?: string` - Raw atomic units (provide either amount or amountRaw)
+
+Returns:
+
+- `signature: string`
+- `explorerUrl: string`
+- `inputMint: string`
+- `outputMint: string`
+- `inAmount: string`
+- `outAmount: string`
+- `status?: string`
+
+## Price & Discovery
+
+### `jupiterGetTokenPrice`
+
+```ts
+jupiterGetTokenPrice(input: JupiterGetPriceInput): Promise<Record<string, JupiterTokenPrice | null>>
+```
+
+Input fields:
+
+- `mints: string[]` - Token mint addresses (max 50)
+
+Returns token prices with USD price, decimals, liquidity, and 24h price change.
+
+### `jupiterSearchToken`
+
+```ts
+jupiterSearchToken(input: JupiterSearchTokenInput): Promise<unknown>
+```
+
+Input fields:
+
+- `query: string` - Token name, symbol, or mint address
+
+### `jupiterGetHoldings`
+
+```ts
+jupiterGetHoldings(input: JupiterGetHoldingsInput): Promise<unknown>
+```
+
+Input fields:
+
+- `address?: string` - Wallet address to query (defaults to current wallet)
+
+### `jupiterGetShield`
+
+```ts
+jupiterGetShield(input: JupiterGetShieldInput): Promise<unknown>
+```
+
+Input fields:
+
+- `mints: string[]` - Token mint addresses to check
+
+Returns security and risk warnings (freeze authority, mint authority, unverified status).
+
+## Limit Orders (Trigger)
+
+### `jupiterCreateLimitOrder`
+
+```ts
+jupiterCreateLimitOrder(input: JupiterCreateLimitOrderInput): Promise<JupiterTxResult>
+```
+
+Input fields:
+
+- `inputMint: string` - Token to sell
+- `outputMint: string` - Token to receive
+- `makingAmount: string` - Raw atomic units of input token to sell
+- `takingAmount: string` - Raw atomic units of output token to receive (sets limit price)
+- `expiredAt?: number` - Order expiry as Unix timestamp
+- `slippageBps?: number` - Slippage in basis points
+
+### `jupiterCancelLimitOrder`
+
+```ts
+jupiterCancelLimitOrder(input: JupiterCancelLimitOrderInput): Promise<JupiterTxResult>
+```
+
+Input fields:
+
+- `order: string` - Order account public key to cancel
+
+### `jupiterGetLimitOrders`
+
+```ts
+jupiterGetLimitOrders(input: JupiterGetLimitOrdersInput): Promise<unknown>
+```
+
+Input fields:
+
+- `address?: string` - Wallet address
+- `orderStatus?: 'active' | 'history'` - Filter by status
+- `inputMint?: string` - Filter by input token
+- `outputMint?: string` - Filter by output token
+- `page?: number` - Page number
+
+## Recurring Orders (DCA)
+
+### `jupiterCreateRecurringOrder`
+
+```ts
+jupiterCreateRecurringOrder(input: JupiterCreateRecurringOrderInput): Promise<JupiterTxResult>
+```
+
+Input fields:
+
+- `inputMint: string` - Token to spend
+- `outputMint: string` - Token to accumulate
+- `inAmount: string` - Total raw atomic units to deposit
+- `numberOfOrders: number` - Total orders to execute (minimum 2)
+- `intervalSeconds: number` - Seconds between orders (e.g. 86400 = daily)
+- `minPrice?: number` - Minimum price to execute
+- `maxPrice?: number` - Maximum price to execute
+- `startAt?: number` - Unix timestamp to start
+
+### `jupiterCancelRecurringOrder`
+
+```ts
+jupiterCancelRecurringOrder(input: JupiterCancelRecurringOrderInput): Promise<JupiterTxResult>
+```
+
+Input fields:
+
+- `order: string` - Order account public key to cancel
+
+### `jupiterGetRecurringOrders`
+
+```ts
+jupiterGetRecurringOrders(input: JupiterGetRecurringOrdersInput): Promise<unknown>
+```
+
+Input fields:
+
+- `address?: string` - Wallet address
+- `orderStatus?: 'active' | 'history'` - Filter by status
+- `page?: number` - Page number
+
+## Lending (Earn)
+
+### `jupiterLendGetTokens`
+
+```ts
+jupiterLendGetTokens(): Promise<unknown>
+```
+
+Get all tokens available for lending with APY rates.
+
+### `jupiterLendDeposit`
+
+```ts
+jupiterLendDeposit(input: JupiterLendDepositInput): Promise<JupiterTxResult>
+```
+
+Input fields:
+
+- `asset: string` - Token mint address
+- `amount: string` - Raw atomic units to deposit
+
+### `jupiterLendWithdraw`
+
+```ts
+jupiterLendWithdraw(input: JupiterLendWithdrawInput): Promise<JupiterTxResult>
+```
+
+Input fields:
+
+- `asset: string` - Token mint address
+- `amount: string` - Shares to burn (NOT raw tokens - use jlToken balance from positions)
+
+### `jupiterLendGetPositions`
+
+```ts
+jupiterLendGetPositions(input: JupiterLendGetPositionsInput): Promise<unknown>
+```
+
+Input fields:
+
+- `address?: string` - Wallet address
+
+### `jupiterLendGetEarnings`
+
+```ts
+jupiterLendGetEarnings(input: JupiterLendGetEarningsInput): Promise<unknown>
+```
+
+Input fields:
+
+- `address?: string` - Wallet address
+- `positions?: string[]` - Specific position public keys
+
+## Prediction Markets
+
+### `jupiterPredictGetEvents`
+
+```ts
+jupiterPredictGetEvents(input: JupiterPredictGetEventsInput): Promise<unknown>
+```
+
+Input fields:
+
+- `category?: 'crypto' | 'sports' | 'politics' | 'esports' | 'culture' | 'economics' | 'tech'`
+- `filter?: 'new' | 'live' | 'trending'`
+- `query?: string` - Search keyword
+- `start?: number` - Pagination start
+- `end?: number` - Pagination end
+- `includeMarkets?: boolean` - Include market data
+
+### `jupiterPredictGetMarket`
+
+```ts
+jupiterPredictGetMarket(input: JupiterPredictGetMarketInput): Promise<unknown>
+```
+
+Input fields:
+
+- `marketId: string` - Market public key
+
+### `jupiterPredictCreateOrder`
+
+```ts
+jupiterPredictCreateOrder(input: JupiterPredictCreateOrderInput): Promise<JupiterTxResult>
+```
+
+Input fields:
+
+- `marketId: string` - Market to trade on
+- `isYes: boolean` - true = buy YES, false = buy NO
+- `depositAmount: string` - Raw atomic units to deposit
+- `depositMint?: string` - Token to use (defaults to USDC)
+- `contracts?: string` - Specific number of contracts
+
+### `jupiterPredictGetPositions`
+
+```ts
+jupiterPredictGetPositions(input: JupiterPredictGetPositionsInput): Promise<unknown>
+```
+
+Input fields:
+
+- `address?: string` - Wallet address
+
+### `jupiterPredictClosePosition`
+
+```ts
+jupiterPredictClosePosition(input: JupiterPredictClosePositionInput): Promise<JupiterTxResult>
+```
+
+Input fields:
+
+- `positionPubkey: string` - Position account to close
+
+### `jupiterPredictClaimPayout`
+
+```ts
+jupiterPredictClaimPayout(input: JupiterPredictClaimPayoutInput): Promise<JupiterTxResult>
+```
+
+Input fields:
+
+- `positionPubkey: string` - Winning position to claim
+
+### `jupiterPredictGetOrderStatus`
+
+```ts
+jupiterPredictGetOrderStatus(input: JupiterPredictGetOrderStatusInput): Promise<unknown>
+```
+
+Input fields:
+
+- `orderPubkey: string` - Order to check
+
+## Tool IDs Registered By Plugin
+
+### Swap Tools
+- `jupiter_swap`
+
+### Price & Discovery Tools
+- `jupiter_get_token_price`
+- `jupiter_search_token`
+- `jupiter_get_holdings`
+- `jupiter_get_shield`
+
+### Limit Order Tools
+- `jupiter_create_limit_order`
+- `jupiter_cancel_limit_order`
+- `jupiter_get_limit_orders`
+
+### Recurring/DCA Tools
+- `jupiter_create_recurring_order`
+- `jupiter_cancel_recurring_order`
+- `jupiter_get_recurring_orders`
+
+### Lending Tools
+- `jupiter_lend_get_tokens`
+- `jupiter_lend_deposit`
+- `jupiter_lend_withdraw`
+- `jupiter_lend_get_positions`
+- `jupiter_lend_get_earnings`
+
+### Prediction Market Tools
+- `jupiter_predict_get_events`
+- `jupiter_predict_get_market`
+- `jupiter_predict_create_order`
+- `jupiter_predict_get_positions`
+- `jupiter_predict_close_position`
+- `jupiter_predict_claim_payout`
+- `jupiter_predict_get_order_status`

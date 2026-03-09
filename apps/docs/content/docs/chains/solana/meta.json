@@ -1,0 +1,10 @@
+{
+    "title": "Solana",
+    "pages": [
+        "wallet",
+        "tools",
+        "rpc-resilience",
+        "signers",
+        "plugins"
+    ]
+}

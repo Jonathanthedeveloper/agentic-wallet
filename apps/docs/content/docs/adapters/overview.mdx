@@ -1,0 +1,19 @@
+---
+title: Adapter Overview
+description: Framework adapters for wallet tool definitions.
+---
+
+## Packages
+
+- `@agentic-wallet/adapters-vercel`
+- `@agentic-wallet/adapters-tanstack`
+
+## Input Requirement
+
+Both adapters accept a source with:
+
+```ts
+{ getTools(): AgentTool[] }
+```
+
+They do not change wallet logic or execution behavior.

@@ -1,0 +1,62 @@
+---
+title: Installation
+description: Install core, a chain package, and optional adapters.
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+## Core
+
+<Tabs items={['npm', 'yarn', 'pnpm', 'bun']}>
+  <Tab value="npm">
+  ```bash
+  npm install @agentic-wallet/core
+  ```
+  </Tab>
+  <Tab value="yarn">
+  ```bash
+  yarn add @agentic-wallet/core
+  ```
+  </Tab>
+  <Tab value="pnpm">
+  ```bash
+  pnpm add @agentic-wallet/core
+  ```
+  </Tab>
+  <Tab value="bun">
+  ```bash
+  bun add @agentic-wallet/core
+  ```
+  </Tab>
+</Tabs>
+
+## Chain Package
+
+Install the chain package you intend to use.
+
+```bash
+npm install @agentic-wallet/<chain-package>
+```
+
+Use [Chains Overview](/docs/chains/overview) for available packages.
+
+## Optional Adapters
+
+Install only if you need framework-specific tool adapters.
+
+<Tabs items={['Vercel AI SDK', 'TanStack AI']}>
+  <Tab value="Vercel AI SDK">
+    ```bash
+    npm install @agentic-wallet/adapters-vercel
+    ```
+  </Tab>
+  <Tab value="TanStack AI">
+    ```bash
+    npm install @agentic-wallet/adapters-tanstack
+    ```
+  </Tab>
+</Tabs>
+
+## Next
+
+Continue to [First Wallet](/docs/getting-started/first-wallet).

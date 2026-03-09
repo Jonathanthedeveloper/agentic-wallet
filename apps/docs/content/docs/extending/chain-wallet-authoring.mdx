@@ -1,0 +1,46 @@
+---
+title: Chain Wallet Authoring
+description: Build a new chain wallet by extending AgentWallet.
+---
+
+## Target Shape
+
+A chain wallet should:
+
+- extend `AgentWallet`
+- expose chain-native methods
+- return native tools from `getTools()`
+- optionally support plugins via `.use(...)`
+
+## Minimal Skeleton
+
+```ts
+import { AgentWallet, type AgentTool } from '@agentic-wallet/core';
+import { z } from 'zod';
+
+export class NewChainWallet extends AgentWallet {
+  constructor(readonly rpcUrl: string, readonly address: string) {
+    super();
+  }
+
+  async balance(input?: { address?: string }) {
+    return { address: input?.address ?? this.address, amount: '0' };
+  }
+
+  override getTools(): AgentTool[] {
+    return [
+      ...super.getTools(),
+      {
+        name: 'newchain_get_balance',
+        description: 'Fetch native balance',
+        inputSchema: z.object({ address: z.string().optional() }),
+        execute: (input) => this.balance(input),
+      },
+    ];
+  }
+}
+```
+
+## Method Naming
+
+If your wallet ships plugins, use plugin-prefixed method names to avoid collisions.

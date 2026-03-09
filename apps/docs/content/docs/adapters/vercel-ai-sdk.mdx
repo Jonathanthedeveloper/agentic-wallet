@@ -1,0 +1,34 @@
+---
+title: Vercel AI SDK Adapter
+description: Map `getTools()` to Vercel AI SDK tool format.
+---
+
+## Function
+
+```ts
+toVercelTools(source)
+```
+
+Input:
+
+```ts
+{ getTools(): AgentTool[] }
+```
+
+Output:
+
+```ts
+Record<string, {
+  description: string;
+  parameters: AgentTool['inputSchema'];
+  execute: AgentTool['execute'];
+}>
+```
+
+## Example
+
+```ts
+import { toVercelTools } from '@agentic-wallet/adapters-vercel';
+
+const tools = toVercelTools(wallet);
+```

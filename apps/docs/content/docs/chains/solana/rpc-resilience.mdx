@@ -1,0 +1,28 @@
+---
+title: RPC and Confirmation
+description: Confirmation behavior and reliability recommendations for Solana.
+---
+
+## Confirmation Behavior
+
+`SolanaAgentWallet` confirms submitted transactions using the blockhash-aware strategy:
+
+```ts
+connection.confirmTransaction({ signature, ...latestBlockhash })
+```
+
+Raydium plugin actions use the same strategy internally.
+
+## Recommendation
+
+- Use `confirmed` commitment for most agent workflows.
+- Use `finalized` only when stricter confirmation is required.
+- Keep a fallback RPC endpoint ready in your app.
+
+## Failure Handling
+
+Handle and log `AgentWalletError` values, especially:
+
+- `NETWORK_FAILURE`
+- `EXECUTOR_FAILURE`
+- `INVALID_ACTION`

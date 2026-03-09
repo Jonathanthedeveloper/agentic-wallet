@@ -1,0 +1,15 @@
+{
+  "title": "Agentic Wallet Docs",
+  "pages": [
+    "index",
+    "getting-started",
+    "examples",
+    "chains",
+    "adapters",
+    "concepts",
+    "integrations",
+    "extending",
+    "operations",
+    "reference"
+  ]
+}

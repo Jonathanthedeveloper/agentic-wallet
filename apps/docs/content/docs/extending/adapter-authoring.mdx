@@ -1,0 +1,37 @@
+---
+title: Adapter Authoring
+description: Adapt `getTools()` output to framework-specific contracts.
+---
+
+## Input Contract
+
+Adapters consume any source implementing:
+
+```ts
+interface ToolSource {
+  getTools(): AgentTool[];
+}
+```
+
+## Rule
+
+Adapters should only remap tool shape. They should not add business logic.
+
+## Minimal Adapter Example
+
+```ts
+import type { AgentTool } from '@agentic-wallet/core';
+
+interface ToolSource {
+  getTools(): AgentTool[];
+}
+
+export function toCustomTools(source: ToolSource) {
+  return source.getTools().map((tool) => ({
+    name: tool.name,
+    description: tool.description,
+    schema: tool.inputSchema,
+    run: tool.execute,
+  }));
+}
+```

@@ -1,0 +1,41 @@
+---
+title: Troubleshooting
+description: Common issues and debugging checklist.
+---
+
+## `INVALID_ACTION`
+
+Common causes:
+
+- malformed addresses
+- invalid amount formats
+- too many decimal places
+- missing required inputs
+
+## `INITIALIZATION_FAILURE`
+
+Common causes:
+
+- plugin initialization failed
+- unsupported network configuration
+
+## `EXECUTOR_FAILURE`
+
+Common causes:
+
+- on-chain instruction failure
+- transaction simulation or send failure
+
+## `NETWORK_FAILURE`
+
+Common causes:
+
+- RPC timeout
+- unstable endpoint
+- rate limits
+
+## Debug Checklist
+
+1. log full `AgentWalletError` payload (`code`, `message`, `details`, `cause`)
+2. validate token decimals and amount units (`amount` vs `amountRaw`)
+3. verify RPC endpoint health and commitment settings

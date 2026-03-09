@@ -1,0 +1,31 @@
+---
+title: LLM Tool Calling
+description: Practical tool-calling integration pattern.
+---
+
+## Pattern
+
+1. Build wallet and register plugins.
+2. Convert tools to your framework shape.
+3. Expose only the tool set the agent should call.
+4. Run app-level policy checks before invoking writes.
+
+## Tool Source
+
+```ts
+const tools = wallet.getTools();
+```
+
+## Adapter Examples
+
+```ts
+import { toVercelTools } from '@agentic-wallet/adapters-vercel';
+import { toTanstackTools } from '@agentic-wallet/adapters-tanstack';
+
+const vercelTools = toVercelTools(wallet);
+const tanstackTools = toTanstackTools(wallet);
+```
+
+## Naming Guidance
+
+Use plugin-prefixed method names and tool IDs so agent tool-calls stay unambiguous.

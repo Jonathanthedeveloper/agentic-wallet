@@ -1,0 +1,32 @@
+---
+title: Architecture
+description: Core, chain packages, plugins, and adapters.
+---
+
+## Layers
+
+1. `@agentic-wallet/core`
+2. chain package
+3. chain plugin entrypoints
+4. optional adapter packages
+
+## Core Layer
+
+Core is intentionally small.
+
+- `AgentWallet` stores and exposes tools
+- `WalletPlugin` augments wallet instances with methods
+- `AgentWalletError` provides a typed error surface
+
+## Chain Layer
+
+Chain wallets extend `AgentWallet` and implement chain-specific methods and tool definitions.
+
+## Plugin Layer
+
+Plugins register:
+
+- `methods` (attached to wallet instance)
+- `tools` (added to `wallet.getTools()`)
+
+Method names should be plugin-prefixed to avoid collisions.

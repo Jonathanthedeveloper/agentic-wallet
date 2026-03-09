@@ -1,0 +1,84 @@
+---
+title: Native Solana Tools
+description: Tool IDs and contracts exposed by SolanaAgentWallet.getTools().
+---
+
+## Tool IDs
+
+- `solana_get_balance`
+- `solana_transfer`
+- `solana_request_airdrop`
+
+## `solana_get_balance`
+
+Description: fetch SOL balance or SPL token balance.
+
+Input:
+
+```ts
+{ address?: string; mint?: string }
+```
+
+Output:
+
+```ts
+{
+  address: string;
+  balance: number;
+  rawAmount?: string;
+  lamports?: string;
+  mint?: string;
+  decimals?: number;
+}
+```
+
+## `solana_transfer`
+
+Description: transfer SOL or SPL token.
+
+Input:
+
+```ts
+{
+  to: string;
+  amount: number | string;
+  mint?: string;
+  createAssociatedTokenAccount?: boolean;
+}
+```
+
+Output:
+
+```ts
+{
+  signature: string;
+  explorerUrl: string;
+  from: string;
+  to: string;
+  amount: string;
+  rawAmount: string;
+  mint?: string;
+}
+```
+
+## `solana_request_airdrop`
+
+Description: request SOL airdrop (devnet/testnet).
+
+Input:
+
+```ts
+{ address?: string; amount?: number | string }
+```
+
+Output:
+
+```ts
+{
+  signature: string;
+  explorerUrl: string;
+  address: string;
+  amount: string;
+  rawAmount: string;
+}
+```

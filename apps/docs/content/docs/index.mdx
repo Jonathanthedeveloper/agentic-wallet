@@ -1,0 +1,70 @@
+---
+title: Agentic Wallet Docs
+description: TypeScript wallet primitives for AI agent tool execution on Solana.
+---
+
+Agentic Wallet is a TypeScript library that provides secure, programmable wallets for AI agents on Solana. Agents can autonomously sign transactions, execute trades, and interact with DeFi protocols.
+
+## What This Library Is
+
+Agentic Wallet exposes wallet actions as typed tools that AI agents can call directly. It handles:
+- Transaction signing and execution
+- Plugin-based DeFi integrations (Jupiter, Raydium)
+- Multiple agent framework adapters (MCP, TanStack AI, Vercel AI SDK)
+
+## Key Features
+
+- **Programmatic Wallet Creation** - Generate wallets or import existing keys
+- **Automatic Transaction Signing** - Agents execute trades without human approval
+- **Plugin System** - Extend with DeFi protocols (Jupiter, Raydium)
+- **Multi-Framework Support** - MCP, TanStack AI, Vercel AI SDK adapters
+- **SPL Token Support** - Hold and transfer any Solana token
+
+## Packages
+
+| Package | Description |
+|---------|-------------|
+| `@agentic-wallet/core` | Base wallet class and plugin types |
+| `@agentic-wallet/solana` | Solana chain implementation |
+| `@agentic-wallet/adapters-mcp` | MCP protocol adapter |
+| `@agentic-wallet/adapters-tanstack` | TanStack AI adapter |
+| `@agentic-wallet/adapters-vercel` | Vercel AI SDK adapter |
+
+## Use Cases
+
+- **DeFi Trading Agents** - Automated token swaps, DCA, lending
+- **Portfolio Management** - Rebalance, collect yields, manage positions
+- **Yield Farming** - Deposit, stake, harvest rewards
+- **Prediction Markets** - Trade on crypto, sports, politics events
+
+## Architecture
+
+```
+┌┐
+│           AI Agent Framework            │
+│  (Claude, GPT, TanStack AI, Vercel AI) │
+└┬┘
+                  │
+┌▼┐
+│        Adapters (MCP, TanStack, etc)    │
+└┬┘
+                  │
+┌▼┐
+│        SolanaAgentWallet (@agentic)     │
+│  ┌┐   │
+│  │  Plugins: Jupiter, Raydium      │   │
+│  └┘   │
+└┬┘
+                  │
+┌▼┐
+│        Solana Blockchain               │
+└┘
+```
+
+## Read This Next
+
+1. [Installation](/docs/getting-started/installation)
+2. [First Wallet](/docs/getting-started/first-wallet)
+3. [Examples](/docs/examples)
+4. [Jupiter Plugin](/docs/chains/solana/plugins/jupiter)
+5. [Core API](/docs/reference/core-api)

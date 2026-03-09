@@ -1,0 +1,51 @@
+---
+title: Core API
+description: Type-level reference for core wallet/plugin interfaces.
+---
+
+## `AgentWallet`
+
+```ts
+class AgentWallet {
+  use<TMethods>(plugin: WalletPlugin<this, TMethods>): this & TMethods;
+  getTools(): AgentTool[];
+}
+```
+
+## `WalletPlugin`
+
+```ts
+interface WalletPlugin<TWallet, TMethods> {
+  name: string;
+  register(wallet: TWallet): {
+    methods: TMethods;
+    tools: AgentTool[];
+  };
+}
+```
+
+## `AgentTool`
+
+```ts
+interface AgentTool<TInput = any, TOutput = any> {
+  name: string;
+  description: string;
+  inputSchema: ZodType<TInput>;
+  execute: (input: TInput) => Promise<TOutput>;
+}
+```
+
+## `AgentWalletError`
+
+```ts
+new AgentWalletError(code, message, {
+  cause?: unknown,
+  details?: Record<string, unknown>,
+})
+```
+
+## `isAgentWalletError`
+
+```ts
+isAgentWalletError(error: unknown): error is AgentWalletError
+```

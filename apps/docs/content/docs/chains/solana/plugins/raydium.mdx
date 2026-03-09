@@ -1,0 +1,323 @@
+---
+title: Raydium Plugin
+description: Raydium methods and tool contracts for SolanaAgentWallet.
+---
+
+:::warning
+**Work in Progress**
+
+The Raydium plugin is currently a work in progress. Many features have incomplete or broken implementations, especially the write operations (non-readonly tools). Use at your own risk. For production use, we recommend the [Jupiter plugin](/docs/chains/solana/plugins/jupiter) which is fully functional.
+:::
+
+## Setup
+
+```ts
+import { SolanaAgentWallet, createKeypairProvider } from '@agentic-wallet/solana';
+import { raydiumPlugin } from '@agentic-wallet/solana/plugin';
+
+const wallet = new SolanaAgentWallet({
+  rpcUrl: 'https://api.devnet.solana.com',
+  provider: createKeypairProvider(process.env.SOLANA_PRIVATE_KEY!),
+}).use(raydiumPlugin());
+```
+
+## Plugin Config
+
+```ts
+raydiumPlugin({
+  cluster?: 'mainnet' | 'devnet',
+  disableLoadToken?: boolean,
+  apiRequestTimeout?: number,
+  apiRequestInterval?: number,
+})
+```
+
+## Method Naming
+
+All plugin methods are prefixed with `raydium` to avoid collisions with other plugins.
+
+## Actions
+
+### `raydiumSwapExactIn`
+
+```ts
+raydiumSwapExactIn(input: RaydiumSwapExactInInput): Promise<RaydiumSwapResult>
+```
+
+Input fields:
+
+- `inputMint: string`
+- `outputMint: string`
+- `amount?: number | string`
+- `amountRaw?: string`
+- `slippageBps?: number`
+
+Returns:
+
+- `signatures: string[]`
+- `explorerUrls: string[]`
+- `inputMint: string`
+- `outputMint: string`
+- `amountInRaw: string`
+- `amountOutRaw: string`
+- `minAmountOutRaw: string`
+- `routeType: 'amm' | 'route'`
+
+### `raydiumCreatePool`
+
+```ts
+raydiumCreatePool(input: RaydiumCreatePoolInput): Promise<{ signatures: string[]; explorerUrls: string[]; pool: unknown }>
+```
+
+Input fields:
+
+- `mintA: string`
+- `mintB: string`
+- `amountA?: number | string`
+- `amountB?: number | string`
+- `amountARaw?: string`
+- `amountBRaw?: string`
+- `startTime?: number`
+- `feeConfigId?: string`
+
+### `raydiumCreateFarm`
+
+```ts
+raydiumCreateFarm(input: RaydiumCreateFarmInput): Promise<{ signatures: string[]; explorerUrls: string[]; farm: unknown }>
+```
+
+Input fields:
+
+- `poolId: string`
+- `programId?: string`
+- `rewards: { mint: string; perSecond: string; openTime: number; endTime: number; rewardType?: 'Standard SPL' | 'Option tokens' }[]`
+
+### `raydiumBurnToken`
+
+```ts
+raydiumBurnToken(input: RaydiumBurnTokenInput): Promise<{ signature: string; explorerUrl: string; mint: string; rawAmount: string }>
+```
+
+Input fields:
+
+- `mint: string`
+- `amount?: number | string`
+- `amountRaw?: string`
+- `owner?: string` (must currently match connected wallet)
+
+### `raydiumAddLiquidity`
+
+```ts
+raydiumAddLiquidity(input: RaydiumAddLiquidityInput): Promise<{ signatures: string[]; explorerUrls: string[]; poolId: string }>
+```
+
+Input fields:
+
+- `poolId: string`
+- `amount?: number | string`
+- `amountRaw?: string`
+- `baseIn?: boolean`
+- `slippageBps?: number`
+
+### `raydiumRemoveLiquidity`
+
+```ts
+raydiumRemoveLiquidity(input: RaydiumRemoveLiquidityInput): Promise<{ signatures: string[]; explorerUrls: string[]; poolId: string }>
+```
+
+Input fields:
+
+- `poolId: string`
+- `lpAmount?: number | string`
+- `lpAmountRaw?: string`
+- `slippageBps?: number`
+
+### `raydiumStakeLiquidity`
+
+```ts
+raydiumStakeLiquidity(input: RaydiumStakeLiquidityInput): Promise<{ signatures: string[]; explorerUrls: string[]; farmId: string }>
+```
+
+Input fields:
+
+- `farmId: string`
+- `amount?: number | string`
+- `amountRaw?: string`
+
+### `raydiumUnstakeLiquidity`
+
+```ts
+raydiumUnstakeLiquidity(input: RaydiumUnstakeLiquidityInput): Promise<{ signatures: string[]; explorerUrls: string[]; farmId: string }>
+```
+
+Input fields:
+
+- `farmId: string`
+- `amount?: number | string`
+- `amountRaw?: string`
+
+### `raydiumHarvestFarmRewards`
+
+```ts
+raydiumHarvestFarmRewards(input: RaydiumHarvestFarmRewardsInput): Promise<{ signatures: string[]; explorerUrls: string[] }>
+```
+
+Input fields:
+
+- `farmIds: string[]`
+
+## Swap Reads
+
+### `raydiumGetSwapPoolsByMints`
+
+```ts
+raydiumGetSwapPoolsByMints(input: RaydiumPoolByMintsInput): Promise<unknown>
+```
+
+Input fields:
+
+- `mint1: string`
+- `mint2?: string`
+- optional query fields: `type`, `sort`, `order`, `page`, `pageSize`
+
+### `raydiumGetSwapPoolsByIds`
+
+```ts
+raydiumGetSwapPoolsByIds(input: RaydiumPoolByIdsInput): Promise<unknown[]>
+```
+
+Input fields:
+
+- `ids: string[]`
+
+## Liquidity Reads
+
+### `raydiumGetLiquidityPools`
+
+```ts
+raydiumGetLiquidityPools(input?: RaydiumPoolQueryInput): Promise<unknown>
+```
+
+Input fields (optional):
+
+- `type`, `sort`, `order`, `page`, `pageSize`
+
+### `raydiumGetLiquidityPoolKeysByIds`
+
+```ts
+raydiumGetLiquidityPoolKeysByIds(input: RaydiumPoolByIdsInput): Promise<unknown[]>
+```
+
+Input fields:
+
+- `ids: string[]`
+
+### `raydiumGetClmmPoolLiquidityLine`
+
+```ts
+raydiumGetClmmPoolLiquidityLine(input: RaydiumPoolLiquidityLineInput): Promise<{ price: string; liquidity: string }[]>
+```
+
+Input fields:
+
+- `poolId: string`
+
+## Portfolio Reads
+
+### `raydiumGetTokenList`
+
+```ts
+raydiumGetTokenList(): Promise<{ mintList: unknown[]; blacklist: string[]; whiteList: string[] }>
+```
+
+### `raydiumGetTokenInfo`
+
+```ts
+raydiumGetTokenInfo(input: RaydiumTokenInfoInput): Promise<unknown[]>
+```
+
+Input fields:
+
+- `mints: string[]`
+
+### `raydiumGetWalletTokenBalances`
+
+```ts
+raydiumGetWalletTokenBalances(input?: RaydiumWalletPortfolioInput): Promise<RaydiumWalletTokenBalance[]>
+```
+
+Input fields:
+
+- `address?: string`
+
+Each token balance contains:
+
+- `mint: string`
+- `amount: string`
+- `decimals: number`
+- `uiAmount: number`
+- `tokenProgram: string`
+
+### `raydiumGetPortfolioSummary`
+
+```ts
+raydiumGetPortfolioSummary(input?: RaydiumWalletPortfolioInput): Promise<RaydiumPortfolioSummary>
+```
+
+Input fields:
+
+- `address?: string`
+
+Returns:
+
+- `tokens`
+- `assetsByToken`
+- `liquidities`
+- `stakes`
+- `yields`
+- `assetByPools`
+
+## Staking Reads
+
+### `raydiumGetStakingFarmsByIds`
+
+```ts
+raydiumGetStakingFarmsByIds(input: RaydiumPoolByIdsInput): Promise<unknown[]>
+```
+
+Input fields:
+
+- `ids: string[]`
+
+### `raydiumGetStakingFarmKeysByIds`
+
+```ts
+raydiumGetStakingFarmKeysByIds(input: RaydiumPoolByIdsInput): Promise<unknown[]>
+```
+
+Input fields:
+
+- `ids: string[]`
+
+## Tool IDs Registered By Plugin
+
+- `raydium_swap_exact_in`
+- `raydium_liquidity_create_pool`
+- `raydium_liquidity_create_farm`
+- `raydium_liquidity_add`
+- `raydium_liquidity_remove`
+- `raydium_liquidity_stake`
+- `raydium_liquidity_unstake`
+- `raydium_liquidity_burn_token`
+- `raydium_staking_harvest_rewards`
+- `raydium_portfolio_summary`
+- `raydium_swap_get_pools_by_mints`
+- `raydium_swap_get_pools_by_ids`
+- `raydium_liquidity_get_pools`
+- `raydium_liquidity_get_pool_keys`
+- `raydium_liquidity_get_clmm_pool_line`
+- `raydium_portfolio_get_token_list`
+- `raydium_portfolio_get_token_info`
+- `raydium_portfolio_get_wallet_token_balances`
+- `raydium_staking_get_farms_by_ids`
+- `raydium_staking_get_farm_keys_by_ids`

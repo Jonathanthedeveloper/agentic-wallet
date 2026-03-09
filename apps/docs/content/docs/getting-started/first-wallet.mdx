@@ -1,0 +1,88 @@
+---
+title: First Wallet
+description: Create a chain wallet, register plugins, and expose tools.
+---
+
+## Step 1: Install Packages
+
+Install the core package and your target chain package:
+
+```bash
+npm install @agentic-wallet/core @agentic-wallet/solana
+# or
+bun add @agentic-wallet/core @agentic-wallet/solana
+```
+
+## Step 2: Create a Wallet
+
+Instantiate the chain wallet:
+
+```ts
+import { SolanaAgentWallet, createKeypairProvider } from '@agentic-wallet/solana';
+
+const wallet = new SolanaAgentWallet({
+  rpcUrl: 'https://api.devnet.solana.com',
+  provider: createKeypairProvider(process.env.SOLANA_PRIVATE_KEY!),
+});
+
+console.log('Wallet address:', wallet.address);
+```
+
+## Step 3: Register Plugins
+
+Add functionality with plugins:
+
+```ts
+import { jupiterPlugin } from '@agentic-wallet/solana/plugin';
+
+const wallet = new SolanaAgentWallet({
+  rpcUrl: 'https://api.devnet.solana.com',
+  provider: createKeypairProvider(process.env.SOLANA_PRIVATE_KEY!),
+}).use(jupiterPlugin({
+  apiKey: process.env.JUPITER_API_KEY,
+}));
+```
+
+Available plugins:
+- **jupiter** - Token swaps, limit orders, DCA, lending, prediction markets
+- **raydium** - Liquidity pools, farms, staking (WIP)
+
+## Step 4: Expose Tools
+
+Get tools for your agent framework:
+
+```ts
+const tools = wallet.getTools();
+console.log('Available tools:', tools.map(t => t.name));
+```
+
+## Quick Examples
+
+### Swap Tokens
+
+```ts
+const result = await wallet.jupiterSwap({
+  inputMint: 'So11111111111111111111111111111111111111112', // SOL
+  outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC
+  amount: '1',
+});
+
+console.log('Swap signature:', result.signature);
+```
+
+### Get Token Price
+
+```ts
+const prices = await wallet.jupiterGetTokenPrice({
+  mints: ['EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'],
+});
+
+console.log('USDC price:', prices['EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v']?.usdPrice);
+```
+
+## Next Steps
+
+1. [Explore Plugins](/docs/chains/solana/plugins/jupiter)
+2. [Try Examples](/docs/examples)
+3. [Integrate with AI Frameworks](/docs/adapters)
+4. [Solana Wallet Reference](/docs/chains/solana/wallet)
