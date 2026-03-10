@@ -1,8 +1,25 @@
 # Agentic Wallet
 
-> **Are you a bounty reviewer?** Check out the [examples](/apps/examples) - there's a CLI tool, MCP server, and trading agent demonstrating autonomous wallet capabilities on devnet!
+> **AI-powered crypto wallet you can talk to.** Just chat naturally and it handles everything autonomously.
 
 TypeScript framework for AI-controlled crypto wallets with DeFi protocol integration.
+
+## Talk to Your Wallet
+
+The Chat Interface is the easiest way to use Agentic Wallet — just tell it what to do:
+
+```
+You: "Swap 0.1 SOL for USDC"
+AI:  *executes swap* "Done! Transaction: ..."
+
+You: "What's my portfolio worth?"
+AI:  *checks all tokens* "You hold $1,247.82 across 5 tokens"
+
+You: "Buy 10 bucks of this new token I found"
+AI:  *finds token on Pump.fun and executes purchase* "Bought!"
+```
+
+[Try the Chat Demo →](/apps/examples/saw-chat)
 
 ## What
 
@@ -65,6 +82,7 @@ const result = await wallet.methods.pumpfunBuy({
 
 See `apps/examples/` for working implementations:
 
+- `saw-chat` - **AI-powered wallet you can talk to** (recommended)
 - `saw-cli` - CLI tool for running wallet commands
 - `saw-mcp` - MCP server for Claude Desktop, Cursor, etc.
 - `trading-agent` - Autonomous trading agent with TanStack AI
