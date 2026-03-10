@@ -13,13 +13,25 @@ Agentic Wallet is **not**:
 
 ## What It Is
 
-Agentic Wallet turns your Solana wallet into a set of **tools** that AI agents can call directly. It handles:
+Agentic Wallet turns your Solana wallet into a **conversational AI assistant** that you can just talk to naturally. Tell it what to do in plain English, and it autonomously handles:
 
+- Trading, swapping, and DeFi operations
+- Portfolio monitoring and rebalancing
+- Token discovery and purchasing
 - Transaction signing and execution
-- DeFi integrations (Jupiter, Pump.fun, Raydium, SNS)
-- Works with any AI framework (TanStack AI, Vercel AI SDK, MCP)
 
-## Quick Example
+### Just Chat With Your Wallet
+
+```ts
+// Tell your wallet what to do
+const response = await chat({
+  message: 'Swap 0.1 SOL for USDC and check my new balance',
+  adapter: openRouterText('google/gemini-2.5-pro'),
+  tools,
+});
+
+// Done. The AI understood, executed, and reported back.
+```
 
 ```ts
 import { chat } from '@tanstack/ai';
@@ -57,6 +69,7 @@ const response = await chat({
 
 ## What You Can Build
 
+- **Chat wallets** - Users just talk naturally, AI handles everything
 - **Trading agents** that autonomously swap, DCA, and rebalance
 - **Yield optimizers** that deposit, stake, and harvest
 - **Portfolio managers** that monitor and adjust positions
@@ -85,13 +98,15 @@ const response = await chat({
 
 ## Get Started
 
-1. [Installation](/docs/getting-started/installation)
-2. [First Wallet](/docs/getting-started/first-wallet)
-3. [Plugins](/docs/chains/solana/plugins)
+1. **[Chat Demo](/docs/examples/chat)** - Try talking to your wallet (easiest!)
+2. [Installation](/docs/getting-started/installation)
+3. [First Wallet](/docs/getting-started/first-wallet)
+4. [Plugins](/docs/chains/solana/plugins)
 
 ## Examples
 
 Check out working examples to see autonomous agent wallets in action:
 
+- **[Chat Interface](/docs/examples/chat)** - Talk to your wallet naturally (start here!)
 - **[CLI Example](/docs/examples/cli)** - Command-line wallet for autonomous agents
 - **[MCP Server](/docs/examples/mcp)** - Integrate with Claude Desktop, Cursor

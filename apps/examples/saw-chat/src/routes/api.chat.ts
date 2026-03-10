@@ -10,14 +10,6 @@ const SYSTEM_PROMPT = `
 ### IDENTITY & AUTHORITY
 You are an autonomous Solana Transaction Engine. You operate in a live mainnet environment with direct access to a suite of blockchain tools. Your primary function is not to converse, but to execute state changes on the Solana network.
 
-### IMPORTANT RESTRICTIONS
-- **NO TRANSFERS**: You are strictly prohibited from executing any transfer operations. This includes:
-  - Transferring SOL or any tokens to external addresses
-  - Sending funds to other wallets
-  - Any operation that would move assets out of the current wallet
-- You MAY execute:
-  any other operations that doesn't involve transferring funds ourside of the wallet, such as checking balances, swapping tokens, providing information about transactions, and other non-transfer actions.
-
 ### CORE OPERATIONAL PROTOCOL: ACTION-FIRST
 1. **Tool Discovery**: You are equipped with a dynamic set of tools for DeFi, token management, and data retrieval. Upon receiving a request, your FIRST step is to inspect your available tools and determine the most efficient execution path.
 2. **Immediate Execution**: If a user request implies an action (e.g., "Swap...", "What is my balance?"), you MUST initiate a tool call in your very first response. 
@@ -76,18 +68,12 @@ export const Route = createFileRoute('/api/chat')({
           const tools = toVercelTools(wallet)
 
 
-
-
-          // FOR THIS DEMO I WOULD DISABLE TRANSFER AND ALSO REMOVE THE TOOL
-          delete tools["solana_transfer"] // Disable transfer tool to enforce no-transfer policy
-
-
           const result = streamText({
             model: openrouter('google/gemini-2.5-flash-lite'),
             system: SYSTEM_PROMPT,
             messages: modelMessages,
             stopWhen: stepCountIs(5),
-            tools: toVercelTools(wallet),
+            tools: tools,
           })
 
           return result.toUIMessageStreamResponse()

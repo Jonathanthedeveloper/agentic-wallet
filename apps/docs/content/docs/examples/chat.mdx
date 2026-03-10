@@ -1,9 +1,27 @@
 ---
 title: Chat Interface
-description: Web-based chat UI for wallet interaction.
+description: AI-powered wallet you can talk to. Just say what you want done.
 ---
 
-The Chat Interface is a **web-based chat UI** built with TanStack Start that allows users to interact with their Solana wallet through a conversational interface.
+The Chat Interface is an **AI-powered wallet** you control entirely through natural language. No buttons, no forms, no complex interfaces — just tell it what you want.
+
+## Talk to Your Wallet
+
+```
+You: "What's my SOL balance?"
+AI:  "You have 2.45 SOL (~$312) in your wallet."
+
+You: "Swap 0.1 SOL for USDC"
+AI:  "Executing swap... Done! Received $67.23 USDC. 
+      https://solscan.io/tx/..."
+
+You: "What tokens do I hold?"
+AI:  "You hold:
+      - 2.45 SOL ($312)
+      - 1,250 USDC
+      - 50,000 BONK ($42)
+      Total: $1,604"
+```
 
 ## What This Is
 
@@ -24,6 +42,9 @@ cd agent-wallet
 # Install dependencies
 bun install
 
+# Build packages (required before running examples)
+bun run build
+
 # Go to chat example
 cd apps/examples/saw-chat
 bun run dev
@@ -41,22 +62,11 @@ Create a `.env` file:
 # Required - your LLM provider
 OPENROUTER_API_KEY=your_openrouter_api_key
 
-# Optional
+# Your wallet - can also be set via the UI
 SOLANA_PRIVATE_KEY=your_base58_private_key
 SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
 JUPITER_API_KEY=your_jupiter_api_key
 ```
-
-### In-App Settings
-
-You can also configure wallet settings directly in the app:
-
-1. Click the **Settings** icon (gear) in the top-right corner
-2. Enter your Solana RPC URL
-3. Enter your Private Key (Base58)
-4. Click Save
-
-Credentials are stored locally in your browser - they're never sent to any server.
 
 ## Features
 
