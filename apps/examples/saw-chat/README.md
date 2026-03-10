@@ -119,13 +119,6 @@ const result = streamText({
 });
 ```
 
-## Security
-
-- Private keys are stored in browser localStorage
-- Credentials are only sent to the API route, not third parties
-- Use devnet for testing
-- Never share your private key
-
 ## Tech Stack
 
 - **Frontend Framework**: TanStack Start
