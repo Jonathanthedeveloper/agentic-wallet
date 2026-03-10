@@ -1,28 +1,12 @@
 import 'dotenv/config';
 import { createTradingWallet } from './wallet.js';
-import { chat, ConstrainedModelMessage, UIMessage } from '@tanstack/ai';
-import { openRouterText } from '@tanstack/ai-openrouter';
-import { toTanstackTools } from '@agentic-wallet/adapters-tanstack';
+import { streamText, stepCountIs } from 'ai';
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import { toVercelTools } from '@agentic-wallet/adapters-vercel';
+import chalk from 'chalk';
 
-async function main() {
-    console.log('Initializing Autonomous Trading Agent...\n');
-
-    const wallet = createTradingWallet();
-
-    let cycle = 0;
-
-
-    while (true) {
-        const stream = chat({
-            messages: [{ role: "user", content: `Cycle ${cycle}: Assess the market and decide on trading actions.` }],
-            adapter: openRouterText("google/gemini-2.5-pro"),
-            tools: toTanstackTools(wallet),
-
-            systemPrompts: [`You are an autonomous trading agent operating on Solana via Jupiter.
+const SYSTEM_PROMPT = `You are an autonomous trading agent operating on Solana via Jupiter.
 Your goal is to grow the wallet's portfolio value over time by making smart, profitable trading decisions.
-
-You have access to the following tools:
-${wallet.getTools().map(tool => `- ${tool.name}: ${tool.description}`).join('\n')}
 
 ## Decision process (follow this on every cycle)
 1. Fetch holdings to understand the current portfolio.
@@ -48,34 +32,76 @@ After each action cycle report:
 - Current portfolio (token, balance, USD value)
 - Action taken (swap/limit order/lend/hold) with rationale
 - Transaction result or order details
-- Estimated portfolio change (in USD)`],
-            modelOptions: {
-                parallel_tool_calls: true,
-                include_reasoning: true
-            }
-        })
+- Estimated portfolio change (in USD)`;
 
-        for await (const chunk of stream) {
-            // @ts-ignore
-            if (chunk.delta) {
-                // @ts-ignorex
-                console.log(chunk.delta); // Process delta updates
-            }
+// Simple markdown formatter for terminal output
+function formatMarkdown(text: string): string {
+    return text
+        // Headers
+        .replace(/^### (.*$)/gim, chalk.yellow.bold('$1'))
+        .replace(/^## (.*$)/gim, chalk.cyan.bold('$1'))
+        .replace(/^# (.*$)/gim, chalk.magenta.bold('$1'))
+        // Bold
+        .replace(/\*\*(.*?)\*\*/g, chalk.bold('$1'))
+        // Italic
+        .replace(/\*(.*?)\*/g, chalk.italic('$1'))
+        // Code blocks
+        .replace(/```([\s\S]*?)```/g, chalk.gray('$1'))
+        // Inline code
+        .replace(/`([^`]+)`/g, chalk.gray('$1'))
+        // Bullet points
+        .replace(/^\s*[-*]\s+(.*$)/gim, '  ' + chalk.green('•') + ' $1')
+        // Links - keep the text, show URL in gray
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1 ' + chalk.underline.gray('$2'));
+}
 
-            // @ts-ignore
-            if (chunk.toolName) {
-                // @ts-ignore
-                console.log(`Tool called: ${chunk.toolName} with input: ${JSON.stringify(chunk.input)}`);
-            }
+async function main() {
+    console.log(chalk.cyan.bold('\n🤖 Initializing Autonomous Trading Agent...\n'));
 
+    const wallet = createTradingWallet();
+    
+    const openrouter = createOpenRouter({
+        apiKey: process.env.OPENROUTER_API_KEY,
+    });
+
+    let cycle = 0;
+
+    while (true) {
+        console.log(chalk.gray('═'.repeat(70)));
+        console.log(chalk.yellow.bold(`📊 Cycle ${cycle}: Market Assessment`));
+        console.log(chalk.gray('═'.repeat(70)));
+        console.log();
+
+        const result = streamText({
+            model: openrouter('google/gemini-2.5-pro'),
+            system: SYSTEM_PROMPT,
+            messages: [{ 
+                role: "user", 
+                content: `Cycle ${cycle}: Assess the market and decide on trading actions.` 
+            }],
+            tools: toVercelTools(wallet),
+            stopWhen: stepCountIs(10),
+        });
+
+        let fullResponse = '';
+        for await (const chunk of result.textStream) {
+            fullResponse += chunk;
         }
+
+        // Format and display the response
+        console.log(formatMarkdown(fullResponse));
+        console.log();
 
         cycle++;
 
         // Wait for a bit before the next cycle to avoid spamming
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        console.log(chalk.gray('⏳ Waiting 60 seconds before next cycle...'));
+        console.log();
+        await new Promise(resolve => setTimeout(resolve, 60000));
     }
-
 }
 
-main().catch(console.error);
+main().catch((error) => {
+    console.error(chalk.red.bold('❌ Error:'), error);
+    process.exit(1);
+});

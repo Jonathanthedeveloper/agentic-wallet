@@ -36,7 +36,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="flex flex-col min-h-screen">
+      <body className="flex flex-col min-h-screen ">
+        <div className='p-2 text-center bg-amber-600'>
+          <p className='text-sm'>Are you a bounty reviewer <a href='/docs/examples' className='underline'>Check out the examples i made </a></p>
+        </div>
         <RootProvider>{children}</RootProvider>
         <Scripts />
       </body>
