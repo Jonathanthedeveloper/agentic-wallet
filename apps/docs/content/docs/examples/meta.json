@@ -3,6 +3,8 @@
   "pages": [
     "index",
     "cli",
-    "mcp"
+    "mcp",
+    "trading-agent",
+    "chat"
   ]
 }

@@ -1,0 +1,145 @@
+---
+title: Trading Agent
+description: Autonomous DeFi trading agent with Vercel AI SDK.
+---
+
+The Trading Agent is an **autonomous DeFi trading agent** that uses Vercel AI SDK + OpenRouter + Jupiter to manage a Solana portfolio continuously.
+
+## What This Is
+
+An autonomous trading agent that:
+- Runs indefinitely, triggering AI decision cycles every 60 seconds
+- Uses Vercel AI SDK with OpenRouter (Gemini 2.5 Pro by default)
+- Executes swaps, limit orders, lending, and token security checks via Jupiter
+- Enforces risk rules: max 30% concentration, keeps 0.02 SOL for fees, skips flagged tokens
+
+## Installation
+
+```bash
+# Clone and install
+git clone https://github.com/Jonathanthedeveloper/agentic-wallet.git
+cd agent-wallet
+
+# Install dependencies
+bun install
+
+# Go to trading agent
+cd apps/examples/trading-agent
+```
+
+## Configuration
+
+Create a `.env` file:
+
+```bash
+# Required
+SOLANA_PRIVATE_KEY=your_base58_private_key
+OPENROUTER_API_KEY=your_openrouter_api_key
+
+# Optional
+SOLANA_RPC_URL=https://api.devnet.solana.com  # defaults to devnet
+JUPITER_API_KEY=your_jupiter_api_key
+```
+
+## Usage
+
+```bash
+bun run dev
+# or
+bun run start
+```
+
+## How It Works
+
+Each cycle the agent:
+
+1. Fetches current portfolio holdings
+2. Checks prices for held assets plus several high-momentum tokens
+3. Runs `jupiter_get_shield` on unfamiliar tokens before trading
+4. Decides the best action: swap, limit order, lend idle assets, or hold
+5. Executes the action and reports the outcome with a transaction link
+6. Summarizes portfolio state and P&L
+
+The agent then waits 60 seconds before starting the next cycle.
+
+## Available Tools
+
+The agent has access to all Jupiter tools:
+
+| Tool | Description |
+|------|-------------|
+| `jupiter_swap` | Execute token swaps |
+| `jupiter_get_token_price` | Real-time prices |
+| `jupiter_search_token` | Find tokens by name or address |
+| `jupiter_get_holdings` | Check portfolio holdings |
+| `jupiter_create_limit_order` | Place limit orders |
+| `jupiter_create_recurring_order` | DCA strategies |
+| `jupiter_lend_deposit` | Deposit to Jupiter Lend |
+| `jupiter_lend_withdraw` | Withdraw from Jupiter Lend |
+| `jupiter_get_shield` | Security verification |
+
+## Risk Rules
+
+The agent enforces these rules via system prompt:
+
+- Never invest more than 30% of total portfolio value in a single non-stable token
+- Always keep at least 0.02 SOL for transaction fees
+- Skip any token flagged by shield as high-risk (freeze/mint authority without verified info)
+- Prefer liquidity and verified tokens over hype
+
+## Output Format
+
+The agent outputs formatted markdown with colorized terminal output:
+
+```
+══════════════════════════════════════════════════════════════
+📊 Cycle 0: Market Assessment
+══════════════════════════════════════════════════════════════
+
+### Current Portfolio
+  • SOL: 1.5 ($165.00)
+  • USDC: 500.00 ($500.00)
+
+### Market Analysis
+  • BONK: +5.2% (24h)
+  • WIF: -2.1% (24h)
+
+### Action Taken
+**Swap** - Sold 0.5 SOL → USDC
+
+### Transaction
+https://solscan.io/tx/...
+
+══════════════════════════════════════════════════════════════
+⏳ Waiting 60 seconds before next cycle...
+```
+
+## Architecture
+
+The agent uses Vercel AI SDK for LLM integration:
+
+```typescript
+import { streamText, stepCountIs } from 'ai';
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
+import { toVercelTools } from '@agentic-wallet/adapters-vercel';
+
+const result = streamText({
+  model: openrouter('google/gemini-2.5-pro'),
+  system: SYSTEM_PROMPT,
+  messages: [{ role: "user", content: prompt }],
+  tools: toVercelTools(wallet),
+  stopWhen: stepCountIs(10),
+});
+
+for await (const chunk of result.textStream) {
+  // Process and format output
+}
+```
+
+## Security Notes
+
+- **Never** commit private keys to version control
+- Use devnet for testing before mainnet
+- The agent operates autonomously - monitor it closely
+- Set up alerts for large transactions
+- Consider starting with small amounts

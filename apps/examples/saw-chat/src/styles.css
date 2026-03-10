@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #0a0a0f;
+  --foreground: #ffffff;
+  --card: #111118;
+  --card-foreground: #ffffff;
+  --primary: #8b5cf6;
+  --primary-foreground: #ffffff;
+  --secondary: #1f1f2e;
+  --secondary-foreground: #ffffff;
+  --muted: #27273a;
+  --muted-foreground: #a1a1aa;
+  --border: #27273a;
+  --input: #27273a;
+  --ring: #8b5cf6;
+}
+
+.dark {
+  --background: #0a0a0f;
+  --foreground: #ffffff;
+  --card: #111118;
+  --card-foreground: #ffffff;
+  --primary: #8b5cf6;
+  --primary-foreground: #ffffff;
+  --secondary: #1f1f2e;
+  --secondary-foreground: #ffffff;
+  --muted: #27273a;
+  --muted-foreground: #a1a1aa;
+  --border: #27273a;
+  --input: #27273a;
+  --ring: #8b5cf6;
+}
+
+@theme inline {
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.prose {
+  color: var(--foreground);
+}
+
+.prose pre {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #1d2e45;
+  color: #e8efff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+}

@@ -3,6 +3,14 @@ title: TanStack AI
 description: Using wallet tools with TanStack AI.
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout';
+
+<Callout type="warning">
+**Tool Execution Issues**
+
+TanStack AI currently has known issues with executing tool calls. The AI may fail to properly invoke tools or return inconsistent results. For production use cases requiring reliable tool execution, we recommend using the [Vercel AI SDK adapter](/docs/adapters/vercel-ai-sdk) instead.
+</Callout>
+
 ## Minimal Setup
 
 ```ts
@@ -51,3 +59,7 @@ toTanstackTools(wallet) // returns ServerTool[]
 ```
 
 Pass the result to `chat()` or `generateText()` as the `tools` option.
+
+## Related
+
+- [Vercel AI SDK Adapter](/docs/adapters/vercel-ai-sdk) - Recommended for production use

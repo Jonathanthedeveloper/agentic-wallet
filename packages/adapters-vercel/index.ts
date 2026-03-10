@@ -6,20 +6,22 @@ export interface ToolSource {
 
 export interface VercelTool {
   description: string;
-  parameters: AgentTool['inputSchema'];
+  inputSchema: AgentTool['inputSchema'];
   execute: AgentTool['execute'];
 }
 
-export function toVercelTools(source: ToolSource): Record<string, VercelTool> {
-  const result: Record<string, VercelTool> = {};
+export interface VercelTools {
+  [toolName: string]: VercelTool;
+}
 
-  for (const tool of source.getTools()) {
-    result[tool.name] = {
+export function toVercelTools(wallet: { getTools(): AgentTool[] }): VercelTools {
+  const tools: Record<string, { description: string; inputSchema: AgentTool['inputSchema']; execute: AgentTool['execute'] }> = {}
+  for (const tool of wallet.getTools()) {
+    tools[tool.name] = {
       description: tool.description,
-      parameters: tool.inputSchema,
+      inputSchema: tool.inputSchema,
       execute: tool.execute,
-    };
+    }
   }
-
-  return result;
+  return tools
 }

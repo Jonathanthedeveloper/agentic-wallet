@@ -36,5 +36,11 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
   }
 }
