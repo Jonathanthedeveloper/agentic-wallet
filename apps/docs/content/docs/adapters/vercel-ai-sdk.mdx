@@ -1,34 +1,61 @@
 ---
-title: Vercel AI SDK Adapter
-description: Map `getTools()` to Vercel AI SDK tool format.
+title: Vercel AI SDK
+description: Using wallet tools with Vercel AI SDK.
 ---
 
-## Function
+## Minimal Setup
 
 ```ts
-toVercelTools(source)
-```
-
-Input:
-
-```ts
-{ getTools(): AgentTool[] }
-```
-
-Output:
-
-```ts
-Record<string, {
-  description: string;
-  parameters: AgentTool['inputSchema'];
-  execute: AgentTool['execute'];
-}>
-```
-
-## Example
-
-```ts
+import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
 import { toVercelTools } from '@agentic-wallet/adapters-vercel';
 
 const tools = toVercelTools(wallet);
+
+const result = await generateText({
+  model: openai('gpt-4o'),
+  message: 'Swap 0.1 SOL for USDC',
+  tools,
+});
 ```
+
+## Full Example
+
+```ts
+import { generateText, streamText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { toVercelTools } from '@agentic-wallet/adapters-vercel';
+import { SolanaAgentWallet, createKeypairProvider } from '@agentic-wallet/solana';
+import { pumpfunPlugin, jupiterPlugin } from '@agentic-wallet/solana/plugin';
+
+const wallet = new SolanaAgentWallet({
+  provider: createKeypairProvider(process.env.PRIVATE_KEY!),
+  rpcUrl: process.env.RPC_URL!,
+}).use(pumpfunPlugin()).use(jupiterPlugin());
+
+// Non-streaming
+const result = await generateText({
+  model: openai('gpt-4o'),
+  message: 'What is my SOL balance?',
+  tools: toVercelTools(wallet),
+});
+
+// Streaming
+const stream = await streamText({
+  model: openai('gpt-4o'),
+  message: 'Buy 0.1 SOL worth of a token',
+  tools: toVercelTools(wallet),
+});
+
+for await (const chunk of stream.fullStream) {
+  // handle chunk
+}
+```
+
+## API
+
+```ts
+toVercelTools(wallet) // returns Record<string, Tool>
+```
+
+Pass the result to `generateText()` or `streamText()` as the `tools` option.

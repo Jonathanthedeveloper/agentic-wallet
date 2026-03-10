@@ -44,8 +44,10 @@ const wallet = new SolanaAgentWallet({
 ```
 
 Available plugins:
-- **jupiter** - Token swaps, limit orders, DCA, lending, prediction markets
+- **pumpfun** - Token creation, bonding curve trading
+- **jupiter** - Token swaps, limit orders, DCA, lending
 - **raydium** - Liquidity pools, farms, staking (WIP)
+- **sns** - .sol domain names
 
 ## Step 4: Expose Tools
 
@@ -61,7 +63,7 @@ console.log('Available tools:', tools.map(t => t.name));
 ### Swap Tokens
 
 ```ts
-const result = await wallet.jupiterSwap({
+const result = await wallet.methods.jupiterSwap({
   inputMint: 'So11111111111111111111111111111111111111112', // SOL
   outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC
   amount: '1',
@@ -73,7 +75,7 @@ console.log('Swap signature:', result.signature);
 ### Get Token Price
 
 ```ts
-const prices = await wallet.jupiterGetTokenPrice({
+const prices = await wallet.methods.jupiterGetTokenPrice({
   mints: ['EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'],
 });
 

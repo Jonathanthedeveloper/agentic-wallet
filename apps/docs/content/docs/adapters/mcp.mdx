@@ -1,10 +1,25 @@
+---
+title: MCP
+description: Run wallet as a Model Context Protocol server.
+---
+
+Connect wallet to any AI agent that supports MCP.
+
+## Installation
+
+```bash
+npm install @agentic-wallet/adapters-mcp @agentic-wallet/solana @modelcontextprotocol/sdk
+```
+
+## Code
+
+```ts
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { registerWithMcp } from "@agentic-wallet/adapters-mcp";
-import { createKeypairProvider, SolanaAgentWallet } from "@agentic-wallet/solana"
+import { createSolanaKeypairFromSecretKey, createKeypairProvider, SolanaAgentWallet } from "@agentic-wallet/solana"
 import { raydiumPlugin, jupiterPlugin, snsPlugin, pumpfunPlugin } from "@agentic-wallet/solana/plugin";
 
-// Create server instance
 const server = new McpServer({
     name: "Solana Agentic Wallet",
     version: "1.0.0",
@@ -34,4 +49,38 @@ async function main() {
 main().catch((err) => {
     console.error("Fatal error:", err);
     process.exit(1);
-});
+}); 
+```
+
+## Run
+
+```bash
+bun src/index.ts
+```
+
+## Configure
+
+Claude Desktop (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "solana-wallet": {
+      "command": "bun",
+      "args": ["/path/to/src/index.ts"],
+      "env": {
+        "SOLANA_RPC_URL": "https://api.mainnet-beta.solana.com",
+        "SOLANA_PRIVATE_KEY": "your_key"
+      }
+    }
+  }
+}
+```
+
+## Sample Prompts
+
+```
+"What's my wallet address?"
+"What's my SOL balance?"
+"Swap 0.1 SOL for USDC"
+```

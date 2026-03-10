@@ -1,84 +1,36 @@
 ---
-title: Native Solana Tools
-description: Tool IDs and contracts exposed by SolanaAgentWallet.getTools().
+title: Tools
+description: Built-in Solana tools available on SolanaAgentWallet.
 ---
 
-## Tool IDs
+Tools available without any plugins.
 
-- `solana_get_balance`
-- `solana_transfer`
-- `solana_request_airdrop`
+## Tools
 
-## `solana_get_balance`
+| Name | Description |
+|------|-------------|
+| `solana_get_balance` | Fetches a user's SOL or SPL token balance |
+| `solana_transfer` | Transfer SOL or SPL tokens to another address |
+| `solana_request_airdrop` | Request SOL airdrop on devnet/testnet |
 
-Description: fetch SOL balance or SPL token balance.
+## Sample Prompts
 
-Input:
-
-```ts
-{ address?: string; mint?: string }
+```
+"What's my SOL balance?"
 ```
 
-Output:
-
-```ts
-{
-  address: string;
-  balance: number;
-  rawAmount?: string;
-  lamports?: string;
-  mint?: string;
-  decimals?: number;
-}
+```
+"Check my USDC balance"
 ```
 
-## `solana_transfer`
-
-Description: transfer SOL or SPL token.
-
-Input:
-
-```ts
-{
-  to: string;
-  amount: number | string;
-  mint?: string;
-  createAssociatedTokenAccount?: boolean;
-}
+```
+"Transfer 0.5 SOL to address..."
 ```
 
-Output:
-
-```ts
-{
-  signature: string;
-  explorerUrl: string;
-  from: string;
-  to: string;
-  amount: string;
-  rawAmount: string;
-  mint?: string;
-}
+```
+"Transfer 100 USDC to wallet address..."
 ```
 
-## `solana_request_airdrop`
-
-Description: request SOL airdrop (devnet/testnet).
-
-Input:
-
-```ts
-{ address?: string; amount?: number | string }
 ```
-
-Output:
-
-```ts
-{
-  signature: string;
-  explorerUrl: string;
-  address: string;
-  amount: string;
-  rawAmount: string;
-}
+"Request 1 SOL airdrop"
 ```

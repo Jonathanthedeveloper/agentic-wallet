@@ -1,5 +1,5 @@
 {
-  "title": "Agentic Wallet Docs",
+  "title": "Introduction",
   "pages": [
     "index",
     "getting-started",
@@ -10,6 +10,7 @@
     "integrations",
     "extending",
     "operations",
-    "reference"
+    "reference",
+    "inspiration"
   ]
 }

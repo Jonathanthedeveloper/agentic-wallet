@@ -1,0 +1,51 @@
+---
+title: Pump.fun
+description: Token creation and bonding curve trading on Pump.fun.
+---
+
+Create tokens, trade on bonding curves, and manage fees on Pump.fun.
+
+## Setup
+
+```ts
+const wallet = new SolanaAgentWallet({ ... }).use(pumpfunPlugin());
+```
+
+## Tools
+
+| Name | Description |
+|------|-------------|
+| `pumpfun_create_token` | Create a new token on the bonding curve |
+| `pumpfun_buy` | Buy tokens from a bonding curve using SOL |
+| `pumpfun_sell` | Sell tokens back to the bonding curve for SOL |
+| `pumpfun_get_token_info` | Get bonding curve info (market cap, reserves, supply) |
+| `pumpfun_get_price` | Get current buy/sell prices per token |
+| `pumpfun_check_graduation` | Check if token has graduated to AMM pool |
+| `pumpfun_create_fee_config` | Create fee sharing configuration |
+| `pumpfun_update_fee_shares` | Update fee distribution among shareholders |
+| `pumpfun_get_fee_config` | Get current fee sharing config |
+| `pumpfun_get_rewards` | Get unclaimed $PUMP token rewards |
+| `pumpfun_get_buy_price_impact` | Calculate price impact before buying |
+| `pumpfun_get_sell_price_impact` | Calculate price impact before selling |
+
+## Sample Prompts
+
+```
+"Create a new token called My Token with symbol MYTKN"
+```
+
+```
+"Buy 0.1 SOL worth of the token at mint address..."
+```
+
+```
+"What's the market cap of this token? Is it graduated yet?"
+```
+
+```
+"Check my $PUMP rewards balance"
+```
+
+```
+"Set up fee sharing: 70% to me, 30% to partner wallet"
+```

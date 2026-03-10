@@ -1,19 +1,55 @@
 ---
-title: Adapter Overview
-description: Framework adapters for wallet tool definitions.
+title: Adapters
+description: Connect wallet tools to AI frameworks.
 ---
 
-## Packages
+Adapters map wallet tools to different AI agent frameworks.
 
-- `@agentic-wallet/adapters-vercel`
-- `@agentic-wallet/adapters-tanstack`
+## MCP
 
-## Input Requirement
+Run wallet as an MCP server:
 
-Both adapters accept a source with:
-
-```ts
-{ getTools(): AgentTool[] }
+```bash
+cd apps/examples/saw-mcp
+bun install
 ```
 
-They do not change wallet logic or execution behavior.
+```bash
+# Run
+bun src/index.ts
+```
+
+Configure in Claude Desktop:
+
+```json
+{
+  "mcpServers": {
+    "solana-wallet": {
+      "command": "bun",
+      "args": ["/path/to/saw-mcp/src/index.ts"],
+      "env": {
+        "SOLANA_PRIVATE_KEY": "your_key",
+        "SOLANA_RPC_URL": "https://api.devnet.solana.com"
+      }
+    }
+  }
+}
+```
+
+## TanStack AI
+
+```ts
+import { toTanstackTools } from '@agentic-wallet/adapters-tanstack';
+
+const tools = toTanstackTools(wallet);
+// pass to chat() or generateText()
+```
+
+## Vercel AI SDK
+
+```ts
+import { toVercelTools } from '@agentic-wallet/adapters-vercel';
+
+const tools = toVercelTools(wallet);
+// pass to generateText() or streamText()
+```

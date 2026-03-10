@@ -1,293 +1,54 @@
 ---
-title: SNS Plugin
-description: Solana Name Service methods and tool contracts for SolanaAgentWallet.
+title: SNS
+description: Solana Name Service - domain registration and resolution.
 ---
 
-The SNS (Solana Name Service) plugin provides comprehensive access to domain registration, resolution, and marketplace operations. This enables agents to register .sol domains, resolve domains to wallet addresses, and participate in the domain marketplace.
+Register and manage .sol domain names on Solana.
 
 ## Setup
 
 ```ts
-import { SolanaAgentWallet, createKeypairProvider } from '@agentic-wallet/solana';
-import { snsPlugin } from '@agentic-wallet/solana/plugin';
-
-const wallet = new SolanaAgentWallet({
-  rpcUrl: 'https://api.devnet.solana.com',
-  provider: createKeypairProvider(process.env.SOLANA_PRIVATE_KEY!),
-}).use(snsPlugin());
+const wallet = new SolanaAgentWallet({ ... }).use(snsPlugin());
 ```
 
-## Plugin Config
+## Tools
 
-```ts
-snsPlugin()
-// No configuration required - uses default SNS program IDs
+| Name | Description |
+|------|-------------|
+| `sns_register_domain` | Register a .sol domain name |
+| `sns_resolve_domain` | Resolve domain to wallet address |
+| `sns_get_primary_domain` | Get wallet's primary domain |
+| `sns_get_all_registered_domains` | Get all registered domains globally |
+| `sns_get_registered_domains_for_address` | Get domains owned by an address |
+| `sns_make_fixed_price_offer` | Make a fixed price offer on a domain |
+| `sns_accept_fixed_price_offer` | Accept a fixed price offer |
+| `sns_make_unsolicited_offer` | Make an unsolicited offer on a domain |
+| `sns_accept_unsolicited_offer` | Accept an unsolicited offer |
+| `sns_cancel_unsolicited_offer` | Cancel an unsolicited offer |
+| `sns_make_category_offer` | Make an offer on a domain category |
+| `sns_accept_category_offer` | Accept a category offer |
+| `sns_make_p2p_offer` | Make a P2P offer |
+| `sns_accept_p2p_offer` | Accept a P2P offer |
+| `sns_cancel_p2p_offer` | Cancel a P2P offer |
+
+## Sample Prompts
+
+```
+"Register the domain myname.sol"
 ```
 
-## Method Naming
-
-All plugin methods are prefixed with `sns` to avoid collisions with other plugins.
-
-## Domain Registration
-
-### `snsRegisterDomain`
-
-```ts
-snsRegisterDomain(input: SnsRegisterDomainInput): Promise<SnsTxResult>
+```
+"What's the wallet address for bonfida.sol?"
 ```
 
-Input fields:
-
-- `domain: string` - Domain name to register (e.g., "myname.sol")
-- `space?: number` - Optional storage allocation (0-10, default 0)
-
-Returns:
-
-- `signature: string`
-- `explorerUrl: string`
-
-## Domain Resolution
-
-### `snsResolveDomain`
-
-```ts
-snsResolveDomain(input: SnsResolveDomainInput): Promise<SnsResolveResult>
+```
+"What's my primary domain?"
 ```
 
-Input fields:
-
-- `domain: string` - Domain name to resolve (e.g., "bonfida.sol")
-
-Returns:
-
-- `domain: string`
-- `resolvedAddress: string` - The wallet address owning the domain
-
-### `snsGetPrimaryDomain`
-
-```ts
-snsGetPrimaryDomain(input: SnsGetPrimaryDomainInput): Promise<SnsPrimaryDomainResult>
+```
+"Make a fixed price offer of 10 USDC for domain.sol"
 ```
 
-Input fields:
-
-- `address?: string` - Wallet address to query (defaults to connected wallet)
-
-Returns:
-
-- `domain?: string` - The primary domain
-- `reverse?: boolean` - Whether it's a reverse record
-
-### `snsGetAllRegisteredDomains`
-
-```ts
-snsGetAllRegisteredDomains(): Promise<unknown>
 ```
-
-Returns all registered domains globally.
-
-### `snsGetAllRegisteredDomainsForAddress`
-
-```ts
-snsGetAllRegisteredDomainsForAddress(input: SnsGetDomainsForAddressInput): Promise<SnsDomainsForAddressResult>
+"Accept the offer for mydomain.sol"
 ```
-
-Input fields:
-
-- `address?: string` - Wallet address to query (defaults to connected wallet)
-
-Returns:
-
-- `address: string`
-- `domains: unknown[]` - Array of domains owned by the address
-
-## Fixed Price Offers (Listings)
-
-Fixed Price Offers allow sellers to list domain names for sale at a predetermined price. Buyers can purchase by paying the specified amount.
-
-### `snsMakeFixedPriceOffer`
-
-```ts
-snsMakeFixedPriceOffer(input: SnsMakeFixedPriceOfferInput): Promise<SnsTxResult>
-```
-
-Input fields:
-
-- `amount: number` - Price in atomic units (e.g., 1000000 = 1 USDC)
-- `mint: string` - Token mint address for payment (e.g., USDC)
-- `domain: string` - Domain name being listed
-- `seller?: string` - Seller address (defaults to connected wallet)
-- `nameOffersId?: string` - Optional custom program ID
-
-### `snsAcceptFixedPriceOffer`
-
-```ts
-snsAcceptFixedPriceOffer(input: SnsAcceptFixedPriceOfferInput): Promise<SnsTxResult>
-```
-
-Input fields:
-
-- `fixedPriceKey: string` - The offer account public key
-- `domain: string` - Domain being purchased
-- `buyer?: string` - Buyer address (defaults to connected wallet)
-- `source?: string` - Token account for payment (defaults to buyer's ATA)
-- `referrer?: string` - Optional referrer address
-- `nameOffersId?: string` - Optional custom program ID
-
-## Unsolicited Offers
-
-Unsolicited offers allow buyers to propose a purchase price for a domain not listed for sale. The domain owner can accept or ignore.
-
-### `snsMakeUnsolicitedOffer`
-
-```ts
-snsMakeUnsolicitedOffer(input: SnsMakeUnsolicitedOfferInput): Promise<SnsTxResult>
-```
-
-Input fields:
-
-- `amount: number` - Offer amount in atomic units
-- `domain: string` - Domain name to make offer on
-- `mint: string` - Token mint for payment
-- `tokenSource: string` - Token account holding the funds (ATA)
-- `owner?: string` - Offer owner (defaults to connected wallet)
-- `nameOffersId?: string` - Optional custom program ID
-
-### `snsAcceptUnsolicitedOffer`
-
-```ts
-snsAcceptUnsolicitedOffer(input: SnsAcceptUnsolicitedOfferInput): Promise<SnsTxResult>
-```
-
-Input fields:
-
-- `offerKey: string` - The offer account public key
-- `offerOwner: string` - The buyer who made the offer
-- `domain: string` - Domain being sold
-- `destination: string` - Token account to receive payment
-- `offerEscrow: string` - Escrow account from the offer
-- `referrer?: string` - Optional referrer address
-- `nameOffersId?: string` - Optional custom program ID
-
-### `snsCancelUnsolicitedOffer`
-
-```ts
-snsCancelUnsolicitedOffer(input: SnsCancelUnsolicitedOfferInput): Promise<SnsTxResult>
-```
-
-Input fields:
-
-- `offerKey: string` - The offer account public key
-- `tokenDestination: string` - Token account to return funds to
-- `owner?: string` - Offer owner (defaults to connected wallet)
-- `nameOffersId?: string` - Optional custom program ID
-
-## Category Offers
-
-Category Offers allow buyers to bid on entire domain categories (e.g., all 4-character .sol domains). Sellers can accept offers for domains in that category.
-
-### `snsMakeCategoryOffer`
-
-```ts
-snsMakeCategoryOffer(input: SnsMakeCategoryOfferInput): Promise<SnsTxResult>
-```
-
-Input fields:
-
-- `amount: number` - Total offer amount in lamports
-- `nbDomains: number` - Number of domains wanted
-- `categoryKey: string` - Category public key (e.g., from @bonfida/sns-categories)
-- `buyer?: string` - Buyer address (defaults to connected wallet)
-- `nameOffersId?: string` - Optional custom program ID
-
-### `snsAcceptCategoryOffer`
-
-```ts
-snsAcceptCategoryOffer(input: SnsAcceptCategoryOfferInput): Promise<SnsTxResult>
-```
-
-Input fields:
-
-- `categoryOfferKey: string` - The category offer account public key
-- `domain: string` - Domain being sold
-- `memberKey: string` - Category membership key for the domain
-- `seller?: string` - Seller address (defaults to connected wallet)
-- `referrer?: string` - Optional referrer address
-- `nameOffersId?: string` - Optional custom program ID
-
-## P2P Offers
-
-P2P (Peer-to-Peer) Offers enable direct transactions between a buyer and seller without public listing.
-
-### `snsMakeP2POffer`
-
-```ts
-snsMakeP2POffer(input: SnsMakeP2POfferInput): Promise<SnsTxResult>
-```
-
-Input fields:
-
-- `amount: number` - SOL amount in lamports (can be 0)
-- `baseDomains: string[]` - Domains the creator wants to sell
-- `quoteDomains: string[]` - Domains the creator wants to buy (from counterparty)
-- `counterParty: string` - The other party's wallet address
-- `endDate?: number` - Unix timestamp when offer expires
-- `owner?: string` - Offer creator (defaults to connected wallet)
-- `nameOffersId?: string` - Optional custom program ID
-
-### `snsAcceptP2POffer`
-
-```ts
-snsAcceptP2POffer(input: SnsAcceptP2POfferInput): Promise<SnsTxResult>
-```
-
-Input fields:
-
-- `p2pKey: string` - The P2P offer account public key
-- `nameOffersId?: string` - Optional custom program ID
-
-### `snsCancelP2POffer`
-
-```ts
-snsCancelP2POffer(input: SnsCancelP2POfferInput): Promise<SnsTxResult>
-```
-
-Input fields:
-
-- `p2pKey: string` - The P2P offer account public key
-- `owner?: string` - Offer creator (defaults to connected wallet)
-- `nameOffersId?: string` - Optional custom program ID
-
-## Common Token Mints
-
-| Token | Mint Address |
-|-------|--------------|
-| SOL | So11111111111111111111111111111111111111112 |
-| USDC | EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v |
-
-## Tool IDs Registered By Plugin
-
-### Domain Management Tools
-- `sns_register_domain`
-- `sns_resolve_domain`
-- `sns_get_primary_domain`
-- `sns_get_all_registered_domains`
-- `sns_get_registered_domains_for_address`
-
-### Fixed Price Offer Tools
-- `sns_make_fixed_price_offer`
-- `sns_accept_fixed_price_offer`
-
-### Unsolicited Offer Tools
-- `sns_make_unsolicited_offer`
-- `sns_accept_unsolicited_offer`
-- `sns_cancel_unsolicited_offer`
-
-### Category Offer Tools
-- `sns_make_category_offer`
-- `sns_accept_category_offer`
-
-### P2P Offer Tools
-- `sns_make_p2p_offer`
-- `sns_accept_p2p_offer`
-- `sns_cancel_p2p_offer`

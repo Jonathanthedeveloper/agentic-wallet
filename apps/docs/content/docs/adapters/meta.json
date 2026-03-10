@@ -2,6 +2,7 @@
   "title": "Adapters",
   "pages": [
     "overview",
+    "mcp",
     "vercel-ai-sdk",
     "tanstack"
   ]

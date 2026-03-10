@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@agentic-wallet/core": "workspace:*",
+    "@pump-fun/pump-sdk": "^1.31.0",
     "@bonfida/name-offers": "^0.3.0-alpha.4",
     "@bonfida/spl-name-service": "^3.0.19",
     "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
@@ -43,14 +44,14 @@
   "peerDependencies": {
     "typescript": "^5"
   },
-  "description": "Solana wallet implementation with Jupiter and Raydium plugins",
+  "description": "Solana wallet implementation with Jupiter, Raydium, and Pump.fun plugins",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Jonathanthedeveloper/agentic-wallet.git",
     "directory": "packages/solana"
   },
-  "keywords": ["solana", "wallet", "ai", "agent", "jupiter", "raydium", "defi"],
+  "keywords": ["solana", "wallet", "ai", "agent", "jupiter", "raydium", "pumpfun", "defi"],
   "devDependencies": {
     "@types/bs58": "^5.0.0"
   },
