@@ -1,7 +1,4 @@
 {
   "title": "Integrations",
-  "pages": [
-    "llm-tool-calling",
-    "llms-txt"
-  ]
+  "pages": ["llm-tool-calling", "llms-txt"]
 }

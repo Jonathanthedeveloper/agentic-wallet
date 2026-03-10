@@ -1,7 +1,4 @@
 {
   "title": "Extending",
-  "pages": [
-    "chain-wallet-authoring",
-    "adapter-authoring"
-  ]
+  "pages": ["chain-wallet-authoring", "adapter-authoring"]
 }

@@ -1,7 +1,4 @@
 {
   "title": "Reference",
-  "pages": [
-    "core-api",
-    "error-codes"
-  ]
+  "pages": ["core-api", "error-codes"]
 }
