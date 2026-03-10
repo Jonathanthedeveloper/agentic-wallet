@@ -17,9 +17,9 @@ export default defineConfig({
       projects: ['./tsconfig.json'],
     }),
     tanstackStart({
-      prerender: {
-        enabled: true,
-      },
+      // prerender: {
+      //   enabled: true,
+      // },
     }),
     react(),
     // please see https://tanstack.com/start/latest/docs/framework/react/guide/hosting#nitro for guides on hosting
