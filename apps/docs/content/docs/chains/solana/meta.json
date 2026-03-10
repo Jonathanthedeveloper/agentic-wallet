@@ -1,10 +1,4 @@
 {
-    "title": "Solana",
-    "pages": [
-        "wallet",
-        "wallet-providers",
-        "tools",
-        "rpc-resilience",
-        "plugins"
-    ]
+  "title": "Solana",
+  "pages": ["wallet", "wallet-providers", "tools", "rpc-resilience", "plugins"]
 }

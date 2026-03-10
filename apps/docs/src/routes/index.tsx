@@ -1,32 +1,38 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { HomeLayout } from 'fumadocs-ui/layouts/home';
-import { baseOptions } from '@/lib/layout.shared';
-import { useState } from 'react';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { HomeLayout } from "fumadocs-ui/layouts/home";
+import { useState } from "react";
+import { baseOptions } from "@/lib/layout.shared";
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: Home,
 });
 
 const chains = [
-  { name: 'Solana', color: '#9945FF', status: 'live' },
-  { name: 'Ethereum', color: '#627EEA', status: 'coming' },
-  { name: 'Polygon', color: '#8247E5', status: 'coming' },
-  { name: 'Base', color: '#0052FF', status: 'coming' },
+  { name: "Solana", color: "#9945FF", status: "live" },
+  { name: "Ethereum", color: "#627EEA", status: "coming" },
+  { name: "Polygon", color: "#8247E5", status: "coming" },
+  { name: "Base", color: "#0052FF", status: "coming" },
 ];
 
 const pluginsByChain: Record<string, Array<{ name: string; desc: string }>> = {
   Solana: [
-    { name: 'Jupiter', desc: 'Swaps, limit orders, DCA' },
-    { name: 'Pump.fun', desc: 'Token creation, bonding curves' },
-    { name: 'Raydium', desc: 'Liquidity pools, farming' },
-    { name: 'SNS', desc: 'Domain names (.sol)' },
+    { name: "Jupiter", desc: "Swaps, limit orders, DCA" },
+    { name: "Pump.fun", desc: "Token creation, bonding curves" },
+    { name: "Raydium", desc: "Liquidity pools, farming" },
+    { name: "SNS", desc: "Domain names (.sol)" },
   ],
   Ethereum: [],
   Polygon: [],
   Base: [],
 };
 
-function ChainSelector({ selected, onSelect }: { selected: string; onSelect: (chain: string) => void }) {
+function ChainSelector({
+  selected,
+  onSelect,
+}: {
+  selected: string;
+  onSelect: (chain: string) => void;
+}) {
   return (
     <div className="flex flex-wrap justify-center gap-2">
       {chains.map((chain) => (
@@ -36,8 +42,8 @@ function ChainSelector({ selected, onSelect }: { selected: string; onSelect: (ch
           onClick={() => onSelect(chain.name)}
           className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
             selected === chain.name
-              ? 'bg-fd-primary text-fd-primary-foreground'
-              : 'border border-fd-border bg-fd-card text-fd-muted-foreground hover:text-fd-foreground'
+              ? "bg-fd-primary text-fd-primary-foreground"
+              : "border border-fd-border bg-fd-card text-fd-muted-foreground hover:text-fd-foreground"
           }`}
         >
           {chain.name}
@@ -48,7 +54,7 @@ function ChainSelector({ selected, onSelect }: { selected: string; onSelect: (ch
 }
 
 function Home() {
-  const [selectedChain, setSelectedChain] = useState('Solana');
+  const [selectedChain, setSelectedChain] = useState("Solana");
   const currentPlugins = pluginsByChain[selectedChain] || [];
 
   return (
@@ -59,22 +65,22 @@ function Home() {
           <p className="text-xs font-medium tracking-[0.12em] text-fd-muted-foreground uppercase">
             Solana · Ethereum · Polygon · Base
           </p>
-          
+
           <h1 className="mt-6 text-4xl font-bold tracking-tight text-fd-foreground sm:text-6xl">
             Wallet Tools for
             <br />
             <span className="text-fd-primary">AI Agents</span>
           </h1>
-          
+
           <p className="mt-6 max-w-xl text-lg text-fd-muted-foreground">
-            Give AI agents wallets. They can trade tokens, manage portfolios, 
+            Give AI agents wallets. They can trade tokens, manage portfolios,
             and interact with DeFi protocols — all with self-custody.
           </p>
 
           <div className="mt-8 flex gap-3">
             <Link
               to="/docs/$"
-              params={{ _splat: 'getting-started/installation' }}
+              params={{ _splat: "getting-started/installation" }}
               className="rounded-md bg-fd-primary px-6 py-3 text-sm font-medium text-fd-primary-foreground transition hover:opacity-90"
             >
               Get Started
@@ -96,9 +102,12 @@ function Home() {
             <h2 className="text-xl font-semibold text-fd-foreground">
               Choose Chain
             </h2>
-            
+
             <div className="mt-6">
-              <ChainSelector selected={selectedChain} onSelect={setSelectedChain} />
+              <ChainSelector
+                selected={selectedChain}
+                onSelect={setSelectedChain}
+              />
             </div>
 
             {currentPlugins.length > 0 ? (
@@ -108,8 +117,12 @@ function Home() {
                     key={plugin.name}
                     className="rounded-lg border border-fd-border bg-fd-card p-4 text-center transition hover:border-fd-primary"
                   >
-                    <div className="font-medium text-fd-foreground">{plugin.name}</div>
-                    <div className="mt-1 text-xs text-fd-muted-foreground">{plugin.desc}</div>
+                    <div className="font-medium text-fd-foreground">
+                      {plugin.name}
+                    </div>
+                    <div className="mt-1 text-xs text-fd-muted-foreground">
+                      {plugin.desc}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -135,7 +148,7 @@ function Home() {
                 <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
               </div>
               <pre className="p-4 text-xs font-mono text-fd-foreground overflow-x-auto">
-{`import { chat } from '@tanstack/ai';
+                {`import { chat } from '@tanstack/ai';
 import { toTanstackTools } from '@agentic-wallet/adapters-tanstack';
 import { SolanaAgentWallet, createKeypairProvider } from '@agentic-wallet/solana';
 import { pumpfunPlugin, jupiterPlugin } from '@agentic-wallet/solana/plugin';
@@ -174,18 +187,18 @@ chat({
             <p className="mt-2 text-sm text-fd-muted-foreground">
               See examples and documentation
             </p>
-            
+
             <div className="mt-6 flex justify-center gap-3">
               <Link
                 to="/docs/$"
-                params={{ _splat: 'getting-started/installation' }}
+                params={{ _splat: "getting-started/installation" }}
                 className="rounded-md bg-fd-primary px-5 py-2.5 text-sm font-medium text-fd-primary-foreground transition hover:opacity-90"
               >
                 Documentation
               </Link>
               <Link
                 to="/docs/$"
-                params={{ _splat: 'examples' }}
+                params={{ _splat: "examples" }}
                 className="rounded-md border border-fd-border bg-fd-card px-5 py-2.5 text-sm font-medium text-fd-foreground transition hover:bg-fd-accent"
               >
                 Examples

@@ -1,7 +1,4 @@
 {
-    "title": "Chains",
-    "pages": [
-        "overview",
-        "solana"
-    ]
+  "title": "Chains",
+  "pages": ["overview", "solana"]
 }

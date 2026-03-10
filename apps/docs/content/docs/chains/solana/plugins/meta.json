@@ -1,9 +1,4 @@
 {
   "title": "Plugins",
-  "pages": [
-    "raydium",
-    "jupiter",
-    "pumpfun",
-    "sns"
-  ]
+  "pages": ["raydium", "jupiter", "pumpfun", "sns"]
 }

@@ -1,7 +1,4 @@
 {
   "title": "Getting Started",
-  "pages": [
-    "installation",
-    "first-wallet"
-  ]
+  "pages": ["installation", "first-wallet", "vercel-web-analytics"]
 }

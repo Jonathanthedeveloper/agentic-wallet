@@ -1,9 +1,9 @@
-import { defineConfig, defineDocs } from 'fumadocs-mdx/config';
-import { rehypeCodeDefaultOptions } from 'fumadocs-core/mdx-plugins';
-import { transformerTwoslash } from 'fumadocs-twoslash';
+import { rehypeCodeDefaultOptions } from "fumadocs-core/mdx-plugins";
+import { defineConfig, defineDocs } from "fumadocs-mdx/config";
+import { transformerTwoslash } from "fumadocs-twoslash";
 
 export const docs = defineDocs({
-  dir: 'content/docs',
+  dir: "content/docs",
   docs: {
     postprocess: {
       includeProcessedMarkdown: true,
