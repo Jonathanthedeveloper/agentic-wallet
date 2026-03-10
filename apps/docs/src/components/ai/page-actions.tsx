@@ -1,4 +1,3 @@
-'use client';
 import { useMemo, useState } from 'react';
 import { Check, ChevronDown, Copy, ExternalLinkIcon, TextIcon } from 'lucide-react';
 import { cn } from '@/lib/cn';
