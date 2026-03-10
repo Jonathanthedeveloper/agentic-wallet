@@ -1,36 +1,140 @@
 ---
-title: Inspiration
-description: Projects and resources that inspired Agentic Wallet.
+title: Inspiration & Story
+description: How the Superteam bounty inspired Agentic Wallet and why we built it this way.
 ---
 
-## Wallet Infrastructure
+## The Bounty That Started It All
 
-- **[Solana Wallet Adapter](https://github.com/anza-xyz/wallet-adapter)** - The standard React context providers for wallet connections. We used their pattern of separating connection state from signing logic.
+This library was born from the [Superteam DAO Solana Agentic Wallet Bounty](https://superteam.fun/earn/listing/defi-developer-challenge-agentic-wallets-for-ai-agents). The challenge was clear: create a prototype AI agent wallet that could autonomously manage crypto assets on Solana.
 
-- **[Reown AppKit](https://reown.com/)** - Formerly WalletConnect. Clean wallet modal and provider interface.
+But we didn't just want to build another wallet. We saw a problem: every AI agent project was rewriting the same tools over and over for different chains and protocols. We built Agentic Wallet to solve that.
 
-- **[Privy](https://privy.io/)** - Embedded wallets done right. Their React hooks API for signing transactions influenced our provider interface.
+## Why We Built This Library
 
-## AI Agents
+### The Problem: Rewriting Tools Over and Over
 
-- **[TanStack AI](https://tanstack.com/ai)** - The server tools pattern. `toTanstackTools()` directly maps our wallet tools to their `ServerTool` format.
+When we started exploring AI agents for Solana, we noticed something frustrating:
 
-- **[Vercel AI SDK](https://sdk.vercel.ai/)** - Streaming-first approach. Their tool execution model inspired our adapter design.
+- Every trading bot needed its own Jupiter integration
+- Every token launch tool reinvented Pump.fun interactions
+- Each agent framework (Vercel AI SDK, TanStack AI, MCP) needed custom implementations
 
-- **[OpenAI Agents SDK](https://openai.com/index/introducing-agents-sdk/)** - Showed how to structure tool definitions for LLM execution.
+The same DeFi operations: swaps, liquidity provision, token purchases—were being reimplemented countless times across different projects.
 
-## DeFi Protocols
+### Our Solution: A Universal Tool Framework
 
-- **[Jupiter](https://jup.ag/)** - The aggregator that makes Solana trading possible. Their API design for swaps, limit orders, and lending is excellent.
+We built Agentic Wallet to be the **abstraction layer** between AI agents and blockchain protocols:
 
-- **[Pump.fun](https://pump.fun/)** - Demonstrated that token creation should be accessible. Their bonding curve mechanics are well-documented.
+```
+AI Agent (any framework) → Agentic Wallet → Solana Protocols (Jupiter, Pump.fun, Raydium)
+```
 
-- **[Raydium](https://raydium.io/)** - AMM and liquidity pools on Solana.
+This means:
+- **Write DeFi tools once** - they're framework-agnostic
+- **Swap AI frameworks easily** - the wallet adapters handle it
+- **Add new protocols** - just create a new plugin
 
-## Learning Resources
+## Key Design Decisions
 
-- **[Solana Cookbook](https://solanacookbook.com/)** - Practical Solana development patterns.
+### Why We Don't Handle Keys
 
-- **[Solana Program Library](https://github.com/solana-labs/solana-program-library)** - Reference implementations for SPL tokens.
+Security is paramount for autonomous agents. Rather than building our own key management (which would be a security liability), we designed the library to be **key-agnostic** and integrate with existing solutions.
 
-- **[Anchor](https://www.anchor-lang.com/)** - The standard for Solana smart contracts. Their IDL-based approach informed how we think about protocol interfaces.
+The [`saw-cli`](/docs/examples/cli) example demonstrates this approach:
+- Uses environment variables for key injection
+- Supports hardware wallets via external signers
+- Allows custom signer implementations
+
+This separation follows the principle of **separation of concerns**:
+- **Wallet library** handles protocol interactions
+- **Key management** is handled by dedicated solutions (external to the library)
+
+### Multi-Agent Support
+
+One agent managing one wallet is simple. Ten agents each managing their own wallets requires proper isolation. We designed for **multi-tenant scenarios**:
+
+- Each wallet instance is independent
+- Tools are namespaced per wallet
+- RPC connections can be shared or isolated
+
+## Scoring Points on the Bounty Criteria
+
+Here's how we addressed each judging criterion:
+
+### ✅ Functional Demonstration
+
+The [`saw-cli`](/docs/examples/cli) and [`trading-agent`](/apps/examples/trading-agent) examples demonstrate:
+- Wallet creation programmatically
+- Automatic transaction signing (via key provider)
+- SOL and SPL token handling
+- Interaction with test DeFi protocols on devnet
+
+### ✅ Security & Proper Key Management
+
+- **No key storage in library** - keys are provided at runtime by external key managers
+- **Signer abstraction** - allows hardware wallet integration
+- **Environment-based secrets** - follows 12-factor app principles
+- **Sandboxed execution** - agents operate in isolated contexts
+
+### ✅ Clear Documentation
+
+This entire docs site demonstrates:
+- Quick start guides
+- API references
+- Architecture explanation
+- Working examples
+
+### ✅ Scalability: Multiple Agents
+
+The library supports multiple agents through:
+- Stateless wallet instances
+- Connection pooling
+- Tool namespacing per wallet
+- Adapter pattern for different agent frameworks
+
+## Technical Highlights
+
+### Plugin System
+
+Protocol integrations are packaged as plugins:
+
+```ts
+import { pumpfunPlugin, jupiterPlugin } from '@agentic-wallet/solana/plugin';
+
+const wallet = new SolanaAgentWallet({...})
+  .use(pumpfunPlugin())
+  .use(jupiterPlugin());
+```
+
+### Framework Adapters
+
+Agents can use their preferred framework:
+
+- **Vercel AI SDK** - [`@agentic-wallet/adapters-vercel`](/docs/adapters/vercel-ai-sdk)
+- **TanStack AI** - [`@agentic-wallet/adapters-tanstack`](/docs/adapters/tanstack)
+- **MCP** - [`@agentic-wallet/adapters-mcp`](/docs/adapters/mcp)
+
+### Auto-Generated Tools
+
+Every plugin automatically generates AI-friendly tools:
+
+```ts
+const tools = wallet.getTools();
+// Returns: [{ name: "jupiter_swap", description: "...", parameters: {...} }]
+```
+
+## What's Next
+
+This is just the beginning. The architecture supports:
+
+- **EVM chains** - via chain-agnostic core
+- **More DeFi protocols** - new plugins
+- **Smart contract interactions** - generic program interfaces
+- **Cross-chain swaps** - multi-chain orchestration
+
+## Resources
+
+- [CLI Example](/docs/examples/cli) - Full autonomous agent example
+- [MCP Example](/docs/examples/mcp) - Claude Desktop integration
+- [Architecture](/docs/concepts/architecture) - Deep dive
+- [Plugin API](/docs/chains/solana/plugins) - Building new integrations

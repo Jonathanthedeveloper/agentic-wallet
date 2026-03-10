@@ -1,5 +1,7 @@
 # Agentic Wallet
 
+> **Are you a bounty reviewer?** Check out the [examples](/apps/examples) - there's a CLI tool, MCP server, and trading agent demonstrating autonomous wallet capabilities on devnet!
+
 TypeScript framework for AI-controlled crypto wallets with DeFi protocol integration.
 
 ## What
