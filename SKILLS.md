@@ -31,6 +31,17 @@ Use this skill when:
 - Lending (deposit/withdraw)
 - Prediction market trading
 
+### Domain Operations (via SNS Plugin)
+- Register SNS domain names (e.g., "myname.sol")
+- Resolve domains to wallet addresses
+- Get primary domain for an address
+- List domains owned by an address
+- Create fixed-price listings for domains
+- Buy fixed-price domain listings
+- Make/accept/cancel unsolicited offers on domains
+- Make/accept/cancel category offers (e.g., 999-club)
+- Make/accept/cancel P2P offers
+
 ### Integrations
 - MCP (Model Context Protocol) adapter
 - TanStack AI adapter (with OpenRouter)
@@ -75,6 +86,69 @@ const result = await wallet.jupiterSwap({
 ```ts
 const prices = await wallet.jupiterGetTokenPrice({
   mints: ['EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'],
+});
+```
+
+### Register SNS Domain
+```ts
+const result = await wallet.snsRegisterDomain({
+  domain: 'myname.sol',
+  space: 0, // optional storage allocation
+});
+```
+
+### Resolve Domain
+```ts
+const result = await wallet.snsResolveDomain({
+  domain: 'bonfida.sol',
+});
+// Returns: { domain: 'bonfida.sol', resolvedAddress: '...' }
+```
+
+### Get Primary Domain
+```ts
+const result = await wallet.snsGetPrimaryDomain({
+  address: 'CWxi4Xq6...', // optional, uses connected wallet if omitted
+});
+```
+
+### Make Fixed Price Offer
+```ts
+const result = await wallet.snsMakeFixedPriceOffer({
+  amount: 1000000, // amount in atomic units (1 USDC)
+  mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC mint
+  domain: 'myname.sol',
+  seller: '...', // optional, defaults to connected wallet
+});
+```
+
+### Buy Fixed Price Offer
+```ts
+const result = await wallet.snsAcceptFixedPriceOffer({
+  fixedPriceKey: '...', // the offer account pubkey
+  domain: 'myname.sol',
+  buyer: '...', // optional, defaults to connected wallet
+});
+```
+
+### Make Unsolicited Offer
+```ts
+const result = await wallet.snsMakeUnsolicitedOffer({
+  amount: 1000000,
+  domain: 'myname.sol',
+  mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+  tokenSource: '...', // ATA of the buyer's funds
+});
+```
+
+### Accept Unsolicited Offer (Seller)
+```ts
+const result = await wallet.snsAcceptUnsolicitedOffer({
+  offerKey: '...',
+  offerOwner: '...', // buyer who made the offer
+  domain: 'myname.sol',
+  destination: '...', // ATA to receive funds
+  offerEscrow: '...', // escrow account from the offer
 });
 ```
 

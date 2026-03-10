@@ -26,7 +26,11 @@
   "dependencies": {
     "@agentic-wallet/core": "workspace:*",
     "@pump-fun/pump-sdk": "^1.31.0",
+    "@bonfida/name-offers": "^0.3.0-alpha.4",
+    "@bonfida/spl-name-service": "^3.0.19",
+    "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
     "@raydium-io/raydium-sdk-v2": "^0.2.32-alpha",
+    "@solana-name-service/sns-sdk-kit": "^0.9.4-beta",
     "@solana-program/token": "^0.12.0",
     "@solana/kit": "^6.2.0",
     "@solana/kora": "^0.1.3",

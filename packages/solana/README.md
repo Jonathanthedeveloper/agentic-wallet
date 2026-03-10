@@ -1,10 +1,6 @@
 # @agentic-wallet/solana
 
-Solana wallet implementation built on `@solana/web3.js`, with tool generation for native operations and plugins.
-
-## Description
-
-`@agentic-wallet/solana` extends `@agentic-wallet/core` with Solana balance, transfer, and airdrop tools, and supports optional plugins like Raydium, Jupiter, and Pump.fun.
+Solana wallet implementation with plugin support for DeFi protocols.
 
 ## Installation
 
@@ -12,116 +8,146 @@ Solana wallet implementation built on `@solana/web3.js`, with tool generation fo
 npm install @agentic-wallet/solana
 ```
 
-## Usage
+## Quick Start
 
 ```ts
 import { SolanaAgentWallet, createKeypairProvider } from '@agentic-wallet/solana';
-import { raydiumPlugin, jupiterPlugin, pumpfunPlugin } from '@agentic-wallet/solana/plugin';
-
-const provider = createKeypairProvider(process.env.SOLANA_PRIVATE_KEY!);
+import { pumpfunPlugin, jupiterPlugin, raydiumPlugin } from '@agentic-wallet/solana/plugin';
 
 const wallet = new SolanaAgentWallet({
-	provider,
-	rpcUrl: 'https://api.mainnet-beta.solana.com',
-})
-	.use(raydiumPlugin())
-	.use(jupiterPlugin())
-	.use(pumpfunPlugin());
+  provider: createKeypairProvider(process.env.SOLANA_PRIVATE_KEY!),
+  rpcUrl: 'https://api.mainnet-beta.solana.com',
+}).use(pumpfunPlugin());
 
+// Get tools for AI agent
 const tools = wallet.getTools();
+
+// Call methods directly
+const tokenInfo = await wallet.methods.pumpfunGetTokenInfo({
+  mint: 'DezXAZ8z7PnrnRJjz3wXBoRgixc6RFDMOvYQkFNiT1gx',
+});
 ```
+
+## Built-in Tools
+
+The wallet includes these tools without plugins:
+
+- `solana_get_balance` - Get SOL or SPL token balance
+- `solana_transfer` - Transfer SOL or tokens
+- `solana_airdrop` - Request devnet SOL airdrop
 
 ## Plugins
 
-### Pump.fun Plugin
+### Pump.fun
 
-Full-featured plugin for the Pump.fun protocol on Solana — token creation, bonding curve trading, fee sharing, and rewards.
+Token creation, bonding curve trading, and fee management.
 
 ```ts
-import { pumpfunPlugin } from '@agentic-wallet/solana/plugin';
-
-const wallet = new SolanaAgentWallet({ ... }).use(pumpfunPlugin());
+.use(pumpfunPlugin())
 ```
 
-#### Tools
+**Common operations:**
 
-| Tool | Description |
-|------|-------------|
-| `pumpfun_create_token` | Create a new token on the Pump.fun bonding curve |
-| `pumpfun_buy` | Buy tokens from a bonding curve using SOL |
-| `pumpfun_sell` | Sell tokens back to the bonding curve for SOL |
-| `pumpfun_get_token_info` | Get comprehensive bonding curve information |
-| `pumpfun_get_price` | Get current buy/sell prices |
-| `pumpfun_check_graduation` | Check graduation progress to AMM pool |
-| `pumpfun_create_fee_config` | Create fee sharing configuration |
-| `pumpfun_update_fee_shares` | Update fee distribution among shareholders |
-| `pumpfun_get_fee_config` | Get current fee sharing configuration |
-| `pumpfun_get_rewards` | Get unclaimed $PUMP token rewards |
-| `pumpfun_get_buy_price_impact` | Calculate price impact before buying |
-| `pumpfun_get_sell_price_impact` | Calculate price impact before selling |
-
-#### Examples
-
-**Create a Token:**
 ```ts
-const result = await wallet.methods.pumpfunCreateToken({
-	name: 'My Token',
-	symbol: 'MYTKN',
-	uri: 'https://arweave.net/metadata.json',
-	mayhemMode: false,
+// Create token
+await wallet.methods.pumpfunCreateToken({
+  name: 'My Token',
+  symbol: 'MYTKN',
+  uri: 'https://arweave.net/...',
 });
-// Returns: { mint, signature, explorerUrl }
-```
 
-**Buy Tokens:**
-```ts
-const result = await wallet.methods.pumpfunBuy({
-	mint: 'TokenMintAddress...',
-	solAmount: '100000000', // 0.1 SOL in lamports
-	slippage: 0.05, // 5% slippage
+// Buy tokens (amount in lamports)
+await wallet.methods.pumpfunBuy({
+  mint: '...',
+  solAmount: '100000000',  // 0.1 SOL
+  slippage: 0.05,
 });
-// Returns: { signature, explorerUrl, tokenAmount, solAmount }
-```
 
-**Sell Tokens:**
-```ts
-const result = await wallet.methods.pumpfunSell({
-	mint: 'TokenMintAddress...',
-	tokenAmount: '1000000', // tokens in raw units
-	slippage: 0.05,
+// Sell tokens (amount in raw units)
+await wallet.methods.pumpfunSell({
+  mint: '...',
+  tokenAmount: '1000000',
+  slippage: 0.05,
 });
-// Returns: { signature, explorerUrl, tokenAmount, solAmount }
+
+// Get token info
+await wallet.methods.pumpfunGetTokenInfo({ mint: '...' });
 ```
 
-**Get Token Info:**
+### Jupiter
+
+Token swaps, limit orders, DCA, lending, and prediction markets.
+
 ```ts
-const info = await wallet.methods.pumpfunGetTokenInfo({
-	mint: 'TokenMintAddress...',
+.use(jupiterPlugin({ apiKey: process.env.JUPITER_API_KEY }))
+```
+
+### Raydium
+
+Liquidity pools and farming.
+
+```ts
+.use(raydiumPlugin())
+```
+
+## Configuration
+
+```ts
+const wallet = new SolanaAgentWallet({
+  provider: createKeypairProvider(privateKey),
+  rpcUrl: 'https://api.mainnet-beta.solana.com',
+  commitment: 'confirmed',  // default
+  explorerCluster: 'mainnet', // or 'devnet', 'testnet'
 });
-// Returns: { mint, marketCap, tokenTotalSupply, isGraduated, ... }
 ```
 
-### Jupiter Plugin
-
-Swap tokens, limit orders, DCA, lending, and prediction markets.
+## Creating a Provider
 
 ```ts
-import { jupiterPlugin } from '@agentic-wallet/solana/plugin';
+// From private key string
+import { createKeypairProvider } from '@agentic-wallet/solana';
+const provider = createKeypairProvider(process.env.PRIVATE_KEY!);
 
-const wallet = new SolanaAgentWallet({ ... }).use(jupiterPlugin({ apiKey: '...' }));
+// From Keypair
+import { Keypair } from '@solana/web3.js';
+const keypair = Keypair.fromSecretKey(new Uint8Array(JSON.parse(process.env.KEYPAIR!)));
+const provider = (message: Uint8Array) => Promise.resolve(keypair.sign(message));
 ```
 
-### Raydium Plugin
+## Plugin Development
 
-Liquidity pools, farming, and staking on Raydium.
+Plugins export a `WalletPlugin` that registers methods and tools:
 
 ```ts
-import { raydiumPlugin } from '@agentic-wallet/solana/plugin';
+import type { WalletPlugin, AgentTool } from '@agentic-wallet/core';
 
-const wallet = new SolanaAgentWallet({ ... }).use(raydiumPlugin());
+export function myPlugin(config?: MyConfig): WalletPlugin<SolanaAgentWallet, MyMethods> {
+  return {
+    name: 'myPlugin',
+    register(wallet) {
+      const methods: MyMethods = {
+        myMethod: async (input) => { /* ... */ },
+      };
+
+      const tools: AgentTool[] = [{
+        name: 'my_plugin_method',
+        description: 'Does something useful',
+        inputSchema: zodSchema,
+        execute: (input) => methods.myMethod(input),
+      }];
+
+      return { methods, tools };
+    },
+  };
+}
 ```
 
-## Related
+## TypeScript
 
-- `@agentic-wallet/core` for base wallet and plugin types.
-- `@agentic-wallet/adapters-vercel` and `@agentic-wallet/adapters-tanstack` for LLM framework tool adapters.
+This package is written in TypeScript and exports type definitions for all methods and inputs.
+
+## See Also
+
+- [Plugin API Reference](/docs/chains/solana/plugins)
+- [Core Wallet API](/docs/chains/solana/wallet)
+- [Examples](/apps/examples)

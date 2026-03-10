@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "typecheck": "bun test",
-    "build": "bun run build:core && bun run build:solana && bun run build:adapters-tanstack && bun run build:adapters-vercel && bun run build:adapters-mcp && bun run build:docs",
+    "build": "bun run --filter @agentic-wallet/core build && bun run --filter @agentic-wallet/solana build && bun run --filter @agentic-wallet/adapters-tanstack build && bun run --filter @agentic-wallet/adapters-vercel build && bun run --filter @agentic-wallet/adapters-mcp build",
     "start": "bun run --watch"
   },
   "description": "TypeScript wallet primitives for AI agents on Solana. Wallet SDK.",

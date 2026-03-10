@@ -1,109 +1,118 @@
 ---
 title: Solana Wallet
-description: Constructor and methods for SolanaAgentWallet.
+description: Creating and configuring SolanaAgentWallet.
 ---
 
-## Constructor
+## Creating a Wallet
+
+```ts
+import { SolanaAgentWallet, createKeypairProvider } from '@agentic-wallet/solana';
+
+const wallet = new SolanaAgentWallet({
+  rpcUrl: 'https://api.mainnet-beta.solana.com',
+  provider: createKeypairProvider(process.env.SOLANA_PRIVATE_KEY!),
+});
+```
+
+## Configuration
 
 ```ts
 new SolanaAgentWallet({
-  rpcUrl,
-  provider,
-  commitment?,
-  explorerCluster?,
+  rpcUrl: string,        // Required - RPC endpoint
+  provider: SolanaWalletProvider,  // Required - signer
+  commitment?: 'processed' | 'confirmed' | 'finalized', // Default: 'confirmed'
+  explorerCluster?: 'mainnet-beta' | 'devnet' | 'testnet', // Default: inferred from rpcUrl
+  koraConfig?: {        // Optional - gasless transactions
+    rpcUrl: string,
+    apiKey?: string,
+    hmacSecret?: string,
+  },
 })
 ```
 
-Input type: `SolanaAgentWalletConfig`
+## Provider Options
 
-- `rpcUrl: string`
-- `provider: SolanaWalletProvider`
-- `commitment?: Commitment`
-- `explorerCluster?: 'mainnet-beta' | 'devnet' | 'testnet'`
+The `provider` can be any of:
 
-## Properties
+- **Keypair** - Hot wallet from private key
+- **Privy** - Embedded wallet
+- **Reown** - WalletConnect 
+- **Phantom** - Browser extension
+- **Solflare** - Browser extension
+- **Custom** - Any signer implementing the interface
 
-- `address: string`
-- `connection: Connection`
-- `provider: SolanaWalletProvider`
-- `explorerCluster: ExplorerCluster`
+See [Wallet Providers](/docs/chains/solana/wallet-providers) for detailed integration guides.
 
-## Methods
-
-### `balance(input?)`
-
-Input type: `BalanceInput`
+## Basic Usage
 
 ```ts
-{ address?: string; mint?: string }
-```
+// Check balance (SOL)
+const balance = await wallet.balance();
+// { address: '...', balance: 1.5, lamports: '1500000000' }
 
-Returns: `Promise<SolanaBalanceResult>`
+// Check balance (SPL token)
+const tokenBalance = await wallet.balance({ mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' });
+// { address: '...', balance: 100, decimals: 6, rawAmount: '100000000', mint: '...' }
 
-```ts
-{
-  address: string;
-  balance: number;
-  rawAmount?: string;
-  decimals?: number;
-  lamports?: string;
-  mint?: string;
-}
-```
+// Transfer SOL
+const result = await wallet.transfer({
+  to: 'RecipientAddress...',
+  amount: '0.5',  // 0.5 SOL
+});
+// { signature: '...', explorerUrl: '...', from: '...', to: '...', amount: '0.5' }
 
-### `transfer(input)`
+// Transfer SPL token
+const result = await wallet.transfer({
+  to: 'RecipientAddress...',
+  amount: '10',
+  mint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v', // USDC
+});
+// { signature: '...', to: '...', amount: '10', mint: '...', rawAmount: '...' }
 
-Input type: `TransferInput`
-
-```ts
-{
-  to: string;
-  amount: number | string;
-  mint?: string;
-  createAssociatedTokenAccount?: boolean;
-}
-```
-
-Returns: `Promise<SolanaTransferResult>`
-
-```ts
-{
-  signature: string;
-  explorerUrl: string;
-  from: string;
-  to: string;
-  amount: string;
-  rawAmount: string;
-  mint?: string;
-}
-```
-
-### `requestAirdrop(input?)`
-
-Input type: `AirdropInput`
-
-```ts
-{ address?: string; amount?: number | string }
-```
-
-Returns: `Promise<SolanaAirdropResult>`
-
-```ts
-{
-  signature: string;
-  explorerUrl: string;
-  address: string;
-  amount: string;
-  rawAmount: string;
-}
+// Request airdrop (devnet only)
+await wallet.requestAirdrop({ amount: '1' });
+// { signature: '...', explorerUrl: '...', address: '...', amount: '1' }
 ```
 
 ## Plugin Registration
 
-```ts
-import { raydiumPlugin } from '@agentic-wallet/solana/plugin';
+Add protocol integrations:
 
-const walletWithRaydium = wallet.use(raydiumPlugin());
+```ts
+import { pumpfunPlugin, jupiterPlugin, raydiumPlugin } from '@agentic-wallet/solana/plugin';
+
+const wallet = new SolanaAgentWallet({ ... })
+  .use(pumpfunPlugin())
+  .use(jupiterPlugin())
+  .use(raydiumPlugin());
 ```
 
-`wallet.use(...)` augments the wallet instance with plugin methods and adds plugin tools to `wallet.getTools()`.
+After registering plugins, methods are available on `wallet.methods`:
+
+```ts
+// Pump.fun
+await wallet.methods.pumpfunCreateToken({ name: 'My Token', symbol: 'TKN', uri: '...' });
+await wallet.methods.pumpfunBuy({ mint: '...', solAmount: '100000000' });
+
+// Jupiter
+await wallet.methods.jupiterSwap({ inputMint: 'SOL', outputMint: 'USDC', amount: '1' });
+```
+
+## Getting Tools for AI Agents
+
+```ts
+// Get all tools (built-in + plugin)
+const tools = wallet.getTools();
+
+// Filter tools
+const onlyTrading = tools.filter(t => 
+  t.name.startsWith('jupiter_') || t.name.startsWith('pumpfun_')
+);
+```
+
+## Properties
+
+- `wallet.address` - The wallet's base58 address (string)
+- `wallet.connection` - The Solana Connection instance
+- `wallet.provider` - The wallet provider
+- `wallet.explorerCluster` - 'mainnet-beta' | 'devnet' | 'testnet'

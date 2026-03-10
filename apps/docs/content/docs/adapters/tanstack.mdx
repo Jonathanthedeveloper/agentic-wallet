@@ -1,28 +1,53 @@
 ---
-title: TanStack Adapter
-description: Map `getTools()` to TanStack AI server tools.
+title: TanStack AI
+description: Using wallet tools with TanStack AI.
 ---
 
-## Function
+## Minimal Setup
 
 ```ts
-toTanstackTools(source)
-```
-
-Input:
-
-```ts
-{ getTools(): AgentTool[] }
-```
-
-Output:
-
-An array of TanStack AI `ServerTool` definitions.
-
-## Example
-
-```ts
+import { chat } from '@tanstack/ai';
+import { openRouterText } from '@tanstack/ai-openrouter';
 import { toTanstackTools } from '@agentic-wallet/adapters-tanstack';
 
 const tools = toTanstackTools(wallet);
+
+const result = await chat({
+  message: 'Swap 0.1 SOL for USDC',
+  adapter: openRouterText('google/gemini-2.5-pro'),
+  tools,
+});
 ```
+
+## Full Example
+
+```ts
+import { chat } from '@tanstack/ai';
+import { openRouterText } from '@tanstack/ai-openrouter';
+import { toTanstackTools } from '@agentic-wallet/adapters-tanstack';
+import { SolanaAgentWallet, createKeypairProvider } from '@agentic-wallet/solana';
+import { pumpfunPlugin, jupiterPlugin } from '@agentic-wallet/solana/plugin';
+
+const wallet = new SolanaAgentWallet({
+  provider: createKeypairProvider(process.env.PRIVATE_KEY!),
+  rpcUrl: process.env.RPC_URL!,
+}).use(pumpfunPlugin()).use(jupiterPlugin());
+
+const stream = chat({
+  message: 'What is my SOL balance?',
+  adapter: openRouterText('google/gemini-2.5-pro'),
+  tools: toTanstackTools(wallet),
+});
+
+for await (const chunk of stream) {
+  console.log(chunk);
+}
+```
+
+## API
+
+```ts
+toTanstackTools(wallet) // returns ServerTool[]
+```
+
+Pass the result to `chat()` or `generateText()` as the `tools` option.

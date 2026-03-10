@@ -1,294 +1,51 @@
 ---
-title: Pump.fun Plugin
-description: Pump.fun methods and tool definitions for SolanaAgentWallet.
+title: Pump.fun
+description: Token creation and bonding curve trading on Pump.fun.
 ---
 
-The Pump.fun plugin provides comprehensive access to the Pump.fun protocol on Solana — token creation, bonding curve trading, fee sharing, and rewards.
+Create tokens, trade on bonding curves, and manage fees on Pump.fun.
 
 ## Setup
 
 ```ts
-import { SolanaAgentWallet, createKeypairProvider } from '@agentic-wallet/solana';
-import { pumpfunPlugin } from '@agentic-wallet/solana/plugin';
-
-const wallet = new SolanaAgentWallet({
-  rpcUrl: 'https://api.mainnet-beta.solana.com',
-  provider: createKeypairProvider(process.env.SOLANA_PRIVATE_KEY!),
-}).use(pumpfunPlugin());
+const wallet = new SolanaAgentWallet({ ... }).use(pumpfunPlugin());
 ```
-
-## Plugin Config
-
-```ts
-pumpfunPlugin({
-  rpcUrl?: string,  // Optional RPC URL override
-})
-```
-
-## Method Naming
-
-All plugin methods are prefixed with `pumpfun` to avoid collisions with other plugins.
-
-## Token Creation
-
-### `pumpfunCreateToken`
-
-```ts
-pumpfunCreateToken(input: PumpfunCreateTokenInput): Promise<PumpfunCreateTokenResult>
-```
-
-Input fields:
-
-- `name: string` - Token name (e.g., "My Token")
-- `symbol: string` - Token symbol (e.g., "MYTKN")
-- `uri: string` - Metadata URI (e.g., from Arweave)
-- `mayhemMode?: boolean` - Use randomized bonding curve parameters
-- `mint?: string` - Custom mint keypair (optional, generates new if not provided)
-
-Returns:
-
-- `mint: string` - The created token mint address
-- `signature: string` - Transaction signature
-- `explorerUrl: string` - URL to view transaction
-
-## Trading
-
-### `pumpfunBuy`
-
-```ts
-pumpfunBuy(input: PumpfunBuyInput): Promise<PumpfunBuyResult>
-```
-
-Input fields:
-
-- `mint: string` - Token mint address to buy
-- `solAmount: string` - Amount of SOL to spend (in lamports, e.g., "100000000" for 0.1 SOL)
-- `slippage?: number` - Slippage tolerance (default: 0.01 = 1%)
-
-Returns:
-
-- `signature: string` - Transaction signature
-- `explorerUrl: string` - URL to view transaction
-- `tokenAmount: string` - Tokens received
-- `solAmount: string` - SOL spent
-
-### `pumpfunSell`
-
-```ts
-pumpfunSell(input: PumpfunSellInput): Promise<PumpfunSellResult>
-```
-
-Input fields:
-
-- `mint: string` - Token mint address to sell
-- `tokenAmount: string` - Amount of tokens to sell (in raw atomic units)
-- `slippage?: number` - Slippage tolerance (default: 0.01 = 1%)
-
-Returns:
-
-- `signature: string` - Transaction signature
-- `explorerUrl: string` - URL to view transaction
-- `tokenAmount: string` - Tokens sold
-- `solAmount: string` - SOL received
-
-## Information
-
-### `pumpfunGetTokenInfo`
-
-```ts
-pumpfunGetTokenInfo(input: PumpfunGetTokenInfoInput): Promise<PumpfunTokenInfo>
-```
-
-Input fields:
-
-- `mint: string` - Token mint address
-
-Returns:
-
-- `mint: string` - Token mint address
-- `marketCap: string` - Current market cap in lamports
-- `tokenTotalSupply: string` - Total token supply
-- `circulatingSupply: string` - Circulating supply
-- `isGraduated: boolean` - Whether token has graduated to AMM
-- `progressBps: number` - Graduation progress in basis points (10000 = 100%)
-- `bondingCurveComplete: boolean` - Whether bonding curve is complete
-- `virtualSolReserves: string` - Virtual SOL reserves
-- `virtualTokenReserves: string` - Virtual token reserves
-
-### `pumpfunGetPrice`
-
-```ts
-pumpfunGetPrice(input: PumpfunGetPriceInput): Promise<PumpfunPriceInfo>
-```
-
-Input fields:
-
-- `mint: string` - Token mint address
-
-Returns:
-
-- `mint: string` - Token mint address
-- `buyPricePerToken: string` - Price per token in lamports (buy)
-- `sellPricePerToken: string` - Price per token in lamports (sell)
-- `marketCap: string` - Current market cap in lamports
-
-### `pumpfunCheckGraduation`
-
-```ts
-pumpfunCheckGraduation(input: PumpfunCheckGraduationInput): Promise<PumpfunGraduationInfo>
-```
-
-Input fields:
-
-- `mint: string` - Token mint address
-
-Returns:
-
-- `mint: string` - Token mint address
-- `isGraduated: boolean` - Whether token has graduated
-- `progressBps: number` - Graduation progress (0-10000)
-- `tokensRemaining: string` - Tokens remaining in bonding curve
-- `solAccumulated: string` - SOL accumulated in curve
-- `targetSol: string` - Target SOL for graduation
-
-### `pumpfunGetBuyPriceImpact`
-
-```ts
-pumpfunGetBuyPriceImpact(input: PumpfunGetBuyPriceImpactInput): Promise<PumpfunPriceImpactResult>
-```
-
-Calculate price impact before buying.
-
-Input fields:
-
-- `mint: string` - Token mint address
-- `solAmount: string` - SOL amount to buy with (in lamports)
-
-Returns:
-
-- `newMarketCap: string` - Expected new market cap
-- `priceImpactBps: number` - Price impact in basis points
-- `pricePerToken: string` - Current price per token
-- `tokensReceived: string` - Expected tokens to receive
-
-### `pumpfunGetSellPriceImpact`
-
-```ts
-pumpfunGetSellPriceImpact(input: PumpfunGetSellPriceImpactInput): Promise<PumpfunPriceImpactResult>
-```
-
-Calculate price impact before selling.
-
-Input fields:
-
-- `mint: string` - Token mint address
-- `tokenAmount: string` - Token amount to sell (in raw units)
-
-Returns:
-
-- `newMarketCap: string` - Expected new market cap
-- `priceImpactBps: number` - Price impact in basis points
-- `pricePerToken: string` - Current price per token
-- `tokensReceived: string` - Expected SOL to receive
-
-## Fee Sharing
-
-### `pumpfunCreateFeeConfig`
-
-```ts
-pumpfunCreateFeeConfig(input: PumpfunCreateFeeConfigInput): Promise<PumpfunCreateFeeConfigResult>
-```
-
-Create a fee sharing configuration for a token.
-
-Input fields:
-
-- `mint: string` - Token mint address
-- `pool?: string` - AMM pool address (required for graduated tokens)
-
-Returns:
-
-- `signature: string` - Transaction signature
-- `explorerUrl: string` - URL to view transaction
-- `feeConfigAddress: string` - Fee config PDA address
-
-### `pumpfunUpdateFeeShares`
-
-```ts
-pumpfunUpdateFeeShares(input: PumpfunUpdateFeeSharesInput): Promise<PumpfunUpdateFeeSharesResult>
-```
-
-Update fee distribution among shareholders.
-
-Input fields:
-
-- `mint: string` - Token mint address
-- `shareholders: FeeShare[]` - Array of shareholders
-  - `address: string` - Shareholder wallet address
-  - `shareBps: number` - Share in basis points (must total 10000)
-
-**Note:** Shares must total exactly 10000 BPS (100%). Maximum 10 shareholders.
-
-Returns:
-
-- `signature: string` - Transaction signature
-- `explorerUrl: string` - URL to view transaction
-
-### `pumpfunGetFeeConfig`
-
-```ts
-pumpfunGetFeeConfig(input: PumpfunGetFeeConfigInput): Promise<PumpfunFeeConfig>
-```
-
-Get current fee sharing configuration.
-
-Input fields:
-
-- `mint: string` - Token mint address
-
-Returns:
-
-- `mint: string` - Token mint address
-- `authority: string` - Fee config authority
-- `pool: string | null` - AMM pool address (if graduated)
-- `shareholders: FeeShare[]` - Current shareholders
-- `totalShareBps: number` - Total shares in BPS
-
-## Rewards
-
-### `pumpfunGetRewards`
-
-```ts
-pumpfunGetRewards(input: PumpfunGetRewardsInput): Promise<PumpfunRewardsInfo>
-```
-
-Get unclaimed $PUMP token rewards.
-
-Input fields:
-
-- `mint: string` - Token mint address
-
-Returns:
-
-- `mint: string` - Token mint address
-- `totalUnclaimedTokens: string` - Total unclaimed $PUMP tokens
-- `currentDayTokens: string` - Tokens earned today
 
 ## Tools
 
-The plugin exposes the following tools for AI agents:
-
-| Tool | Description |
+| Name | Description |
 |------|-------------|
-| `pumpfun_create_token` | Create a new token on the Pump.fun bonding curve |
+| `pumpfun_create_token` | Create a new token on the bonding curve |
 | `pumpfun_buy` | Buy tokens from a bonding curve using SOL |
 | `pumpfun_sell` | Sell tokens back to the bonding curve for SOL |
-| `pumpfun_get_token_info` | Get comprehensive bonding curve information |
-| `pumpfun_get_price` | Get current buy/sell prices |
-| `pumpfun_check_graduation` | Check graduation progress to AMM pool |
+| `pumpfun_get_token_info` | Get bonding curve info (market cap, reserves, supply) |
+| `pumpfun_get_price` | Get current buy/sell prices per token |
+| `pumpfun_check_graduation` | Check if token has graduated to AMM pool |
 | `pumpfun_create_fee_config` | Create fee sharing configuration |
 | `pumpfun_update_fee_shares` | Update fee distribution among shareholders |
-| `pumpfun_get_fee_config` | Get current fee sharing configuration |
+| `pumpfun_get_fee_config` | Get current fee sharing config |
 | `pumpfun_get_rewards` | Get unclaimed $PUMP token rewards |
 | `pumpfun_get_buy_price_impact` | Calculate price impact before buying |
 | `pumpfun_get_sell_price_impact` | Calculate price impact before selling |
+
+## Sample Prompts
+
+```
+"Create a new token called My Token with symbol MYTKN"
+```
+
+```
+"Buy 0.1 SOL worth of the token at mint address..."
+```
+
+```
+"What's the market cap of this token? Is it graduated yet?"
+```
+
+```
+"Check my $PUMP rewards balance"
+```
+
+```
+"Set up fee sharing: 70% to me, 30% to partner wallet"
+```

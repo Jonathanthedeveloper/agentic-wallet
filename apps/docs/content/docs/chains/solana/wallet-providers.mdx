@@ -1,0 +1,136 @@
+---
+title: Wallet Providers
+description: Connecting external wallets to SolanaAgentWallet.
+---
+
+The only thing SolanaAgentWallet needs is a `provider` with a `publicKey` and signing methods.
+
+## Required Interface
+
+```ts
+interface SolanaWalletProvider {
+  publicKey: PublicKey;
+  signTransaction?: (tx: Transaction) => Promise<Transaction>;
+  signAndSendTransaction?: (tx: Transaction) => Promise<{ signature: string }>;
+}
+```
+
+## Simplest Integration
+
+### Privy
+
+```tsx
+import { useWallets, useSignAndSendTransaction } from '@privy-io/react-auth/solana';
+
+const { wallets } = useWallets();
+const { signAndSendTransaction } = useSignAndSendTransaction();
+const wallet = wallets[0];
+
+// Create provider directly from hooks
+const provider = {
+  publicKey: new PublicKey(wallet.address),
+  signAndSendTransaction: (tx) => signAndSendTransaction({
+    transaction: tx.serialize(),
+    wallet,
+  }).then(r => ({ signature: r.signature.toString() })),
+};
+
+const agent = new SolanaAgentWallet({ rpcUrl, provider });
+```
+
+### Reown AppKit
+
+```tsx
+import { useAppKitProvider } from '@reown/appkit/react';
+import { useAppKitConnection } from '@reown/appkit-adapter-solana/react';
+import type { Provider } from '@reown/appkit-adapter-solana/react';
+
+const { walletProvider } = useAppKitProvider<Provider>('solana');
+const { connection } = useAppKitConnection();
+
+const provider = {
+  publicKey: walletProvider.publicKey,
+  signAndSendTransaction: (tx) => walletProvider.signAndSendTransaction(tx),
+};
+
+const agent = new SolanaAgentWallet({ rpcUrl: connection.rpcEndpoint, provider });
+```
+
+### Phantom (Browser)
+
+```tsx
+const phantom = window.phantom?.solana;
+await phantom.connect();
+
+const provider = {
+  publicKey: phantom.publicKey,
+  signAndSendTransaction: (tx) => 
+    phantom.signAndSendTransaction(tx, { skipPreflight: false })
+      .then(r => ({ signature: r.signature })),
+};
+```
+
+### Solflare
+
+```tsx
+import { SolflareWalletAdapter } from '@solana/wallet-adapter-solflare';
+
+const adapter = new SolflareWalletAdapter();
+await adapter.connect();
+
+const provider = {
+  publicKey: adapter.publicKey,
+  signAndSendTransaction: (tx) => adapter.sendTransaction(tx, connection)
+    .then(sig => ({ signature: sig })),
+};
+```
+
+### Keypair (Hot Wallet)
+
+```ts
+import { createKeypairProvider } from '@agentic-wallet/solana';
+
+const provider = createKeypairProvider('your-base58-private-key');
+const agent = new SolanaAgentWallet({ rpcUrl, provider });
+```
+
+## Full Example
+
+```tsx
+import { useState, useEffect } from 'react';
+import { useAppKitProvider } from '@reown/appkit/react';
+import { useAppKitConnection } from '@reown/appkit-adapter-solana/react';
+import { SolanaAgentWallet } from '@agentic-wallet/solana';
+import { pumpfunPlugin } from '@agentic-wallet/solana/plugin';
+import type { Provider } from '@reown/appkit-adapter-solana/react';
+
+export function MyComponent() {
+  const { walletProvider } = useAppKitProvider<Provider>('solana');
+  const { connection } = useAppKitConnection();
+  const [wallet, setWallet] = useState<SolanaAgentWallet | null>(null);
+
+  useEffect(() => {
+    if (!walletProvider) return;
+
+    const agent = new SolanaAgentWallet({
+      rpcUrl: connection.rpcEndpoint,
+      provider: {
+        publicKey: walletProvider.publicKey,
+        signAndSendTransaction: (tx) => walletProvider.signAndSendTransaction(tx),
+      },
+    }).use(pumpfunPlugin());
+
+    setWallet(agent);
+  }, [walletProvider, connection]);
+
+  const handleBuy = async () => {
+    if (!wallet) return;
+    await wallet.methods.pumpfunBuy({
+      mint: 'DezXAZ8z7PnrnRJjz3wXBoRgixc6RFDMOvYQkFNiT1gx',
+      solAmount: '100000000', // 0.1 SOL
+    });
+  };
+
+  return <button onClick={handleBuy}>Buy</button>;
+}
+```

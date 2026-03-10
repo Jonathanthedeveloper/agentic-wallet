@@ -2,9 +2,9 @@
     "title": "Solana",
     "pages": [
         "wallet",
+        "wallet-providers",
         "tools",
         "rpc-resilience",
-        "signers",
         "plugins"
     ]
 }

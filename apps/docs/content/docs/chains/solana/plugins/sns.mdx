@@ -1,0 +1,54 @@
+---
+title: SNS
+description: Solana Name Service - domain registration and resolution.
+---
+
+Register and manage .sol domain names on Solana.
+
+## Setup
+
+```ts
+const wallet = new SolanaAgentWallet({ ... }).use(snsPlugin());
+```
+
+## Tools
+
+| Name | Description |
+|------|-------------|
+| `sns_register_domain` | Register a .sol domain name |
+| `sns_resolve_domain` | Resolve domain to wallet address |
+| `sns_get_primary_domain` | Get wallet's primary domain |
+| `sns_get_all_registered_domains` | Get all registered domains globally |
+| `sns_get_registered_domains_for_address` | Get domains owned by an address |
+| `sns_make_fixed_price_offer` | Make a fixed price offer on a domain |
+| `sns_accept_fixed_price_offer` | Accept a fixed price offer |
+| `sns_make_unsolicited_offer` | Make an unsolicited offer on a domain |
+| `sns_accept_unsolicited_offer` | Accept an unsolicited offer |
+| `sns_cancel_unsolicited_offer` | Cancel an unsolicited offer |
+| `sns_make_category_offer` | Make an offer on a domain category |
+| `sns_accept_category_offer` | Accept a category offer |
+| `sns_make_p2p_offer` | Make a P2P offer |
+| `sns_accept_p2p_offer` | Accept a P2P offer |
+| `sns_cancel_p2p_offer` | Cancel a P2P offer |
+
+## Sample Prompts
+
+```
+"Register the domain myname.sol"
+```
+
+```
+"What's the wallet address for bonfida.sol?"
+```
+
+```
+"What's my primary domain?"
+```
+
+```
+"Make a fixed price offer of 10 USDC for domain.sol"
+```
+
+```
+"Accept the offer for mydomain.sol"
+```
