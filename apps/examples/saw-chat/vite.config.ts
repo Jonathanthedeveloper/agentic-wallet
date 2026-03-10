@@ -7,15 +7,16 @@ import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
 const config = defineConfig({
+  server: {
+    port: 3000,
+  },
   plugins: [
     devtools(),
-    nitro({
-      preset: "vercel"
-    }),
     tsconfigPaths({ projects: ['./tsconfig.json'] }),
     tailwindcss(),
     tanstackStart(),
     viteReact(),
+    nitro(),
   ],
 })
 
