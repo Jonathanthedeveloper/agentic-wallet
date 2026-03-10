@@ -2,6 +2,7 @@
   "title": "Plugins",
   "pages": [
     "raydium",
-    "jupiter"
+    "jupiter",
+    "sns"
   ]
 }

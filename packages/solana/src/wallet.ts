@@ -8,12 +8,18 @@ import {
   VersionedTransaction,
   LAMPORTS_PER_SOL,
   type ParsedAccountData,
+  Keypair,
 } from '@solana/web3.js';
 import {
   getAssociatedTokenAddressSync,
   createAssociatedTokenAccountInstruction,
   createTransferCheckedInstruction,
   getMint,
+  TOKEN_PROGRAM_ID,
+  getMinimumBalanceForRentExemptMint,
+  MINT_SIZE,
+  createInitializeMintInstruction,
+  createMintToInstruction,
 } from '@solana/spl-token';
 import { inferExplorerCluster, toExplorerTxUrl } from './utils';
 import { balanceSchema, transferSchema, airdropSchema } from './schemas';
@@ -89,6 +95,8 @@ export class SolanaAgentWallet extends AgentWallet {
     this.explorerCluster = config.explorerCluster ?? inferExplorerCluster(config.rpcUrl);
     this.koraClient = config.koraConfig ? new KoraClient(config.koraConfig) : undefined;
   }
+
+
 
   async balance(input?: BalanceInput): Promise<SolanaBalanceResult> {
     const targetAddress = input?.address ?? this.address;
@@ -246,7 +254,6 @@ export class SolanaAgentWallet extends AgentWallet {
       rawAmount: lamportsAmount.toString(),
     };
   }
-
   override getTools(): AgentTool[] {
     return [
       ...super.getTools(),
